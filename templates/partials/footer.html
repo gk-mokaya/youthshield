@@ -1,0 +1,196 @@
+<footer class="footer">
+    <style>
+        .footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 30px 0 15px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo {
+            font-family:Georgia, 'Times New Roman', Times, serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo i {
+            color: var(--accent-color);
+        }
+
+        .footer-about p {
+            opacity: 0.8;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-heading {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: white;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+            transform: translateX(5px);
+        }
+
+        .footer-links i {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+        }
+
+        .contact-info {
+            list-style: none;
+        }
+
+        .contact-info li {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .contact-info i {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 30px;
+            text-align: center;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer {
+                padding: 20px 0 10px;
+            }
+
+            .footer-content {
+                gap: 20px;
+            }
+        }
+    </style>
+
+    <div class="container">
+        <div class="footer-content">
+            <!-- About Column -->
+            <div class="footer-about">
+                <a href="{% url 'core:home' %}" class="footer-logo">
+                    {% if website_settings.logo %}
+                        <img src="{{ website_settings.logo.url }}" alt="{{ website_settings.name|default:'Youth Shield Foundation' }}" height="40">
+                    {% else %}
+                        <i class="fas fa-graduation-cap"></i>
+                    {% endif %}
+                    <span>{{ website_settings.name|default:"Youth Shield Foundation" }}</span>
+                </a>
+                <p>{{ website_settings.description|default:"Youth Shield Foundaton is a non-governmental organization dedicated to creating a society free from drug and substance abuse. Fostering long-term personal and professional growth for a healthier future."}}</p>
+                <div class="social-links">
+                    <a href="{% if website_settings.facebook_url %}{{ website_settings.facebook_url }}{% else %}#{% endif %}" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="{% if website_settings.twitter_url %}{{ website_settings.twitter_url }}{% else %}#{% endif %}" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="{% if website_settings.instagram_url %}{{ website_settings.instagram_url }}{% else %}#{% endif %}" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="{% if website_settings.linkedin_url %}{{ website_settings.linkedin_url }}{% else %}#{% endif %}" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="{% if website_settings.tiktok_url %}{{ website_settings.tiktok_url }}{% else %}#{% endif %}" class="social-link"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <!-- Contact Column -->
+            <div class="footer-contact">
+                <h3 class="footer-heading">Contact Info</h3>
+                <ul class="contact-info">
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Address</strong>
+                            <p>{{ website_settings.address|default:"P.O Box 1125 - 30100, Eldoret" }}</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <strong>Phone</strong>
+                            <p>{{ website_settings.contact_phone|default:"+254 797 252 133" }}</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <strong>Email</strong>
+                            <p>{{ website_settings.contact_email|default:"info@youthshield.org" }}</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>{{ website_settings.copyright_text|default:"© 2025 Youth Shield Foundation." }} | <a>Version__3.2</a> | <a href="#" style="color: var(--accent-color);">Developed by gk-Mokaya"</a></p>
+        </div>
+    </div>
+</footer>

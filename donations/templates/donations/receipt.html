@@ -1,0 +1,736 @@
+{% extends 'base.html' %}
+
+{% block title %}Receipt - Youthshieldfoundation{% endblock %}
+
+{% block extra_css %}
+<style>
+/* A5 sizing and minimal styling */
+:root {
+    --primary: #4f46e5;
+    --success: #10b981;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --border: 1px solid var(--gray-200);
+}
+
+/* A5 container (148mm x 210mm) */
+.receipt-a5 {
+    max-width: 148mm;
+    min-height: 210mm;
+    margin: 0 auto;
+    background: white;
+    padding: 12mm;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: var(--border);
+}
+
+/* Compact header with logo and org info */
+.receipt-header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-800);
+    margin-bottom: 1.5rem;
+}
+
+.org-logo {
+    width: 50px;
+    height: 50px;
+    background:none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.org-info {
+    flex: 1;
+    margin-left: 10PX;
+}
+
+.org-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 0 0 0.25rem 0;
+}
+
+.org-tagline {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    margin: 0 0 0.5rem 0;
+}
+
+.org-contact {
+    font-size: 0.7rem;
+    color: var(--gray-600);
+    line-height: 1.3;
+}
+
+.org-contact p {
+    margin: 0.1rem 0;
+}
+
+/* Receipt title section */
+.receipt-title-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.receipt-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 0 0 0.25rem 0;
+}
+
+.receipt-subtitle {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.75rem 0;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--success);
+    color: white;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+/* Main content - compact layout */
+.receipt-content {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* Donation amount highlight */
+.amount-section {
+    text-align: center;
+    padding: 1rem;
+    background: var(--gray-100);
+    border-radius: 6px;
+    border: var(--border);
+}
+
+.amount-label {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.5rem 0;
+}
+
+.amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin: 0;
+}
+
+/* Compact details grid */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.detail-item {
+    padding: 0.75rem;
+    background: var(--gray-100);
+    border-radius: 6px;
+    border: var(--border);
+}
+
+.detail-label {
+    font-size: 0.65rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.25rem 0;
+}
+
+.detail-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-800);
+    margin: 0;
+    word-break: break-all;
+}
+
+/* Donor information */
+.donor-section {
+    padding: 0.75rem;
+    background: var(--gray-100);
+    border-radius: 6px;
+    border: var(--border);
+}
+
+.donor-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 0.5rem 0;
+}
+
+.donor-details {
+    font-size: 0.8rem;
+    color: var(--gray-800);
+    line-height: 1.4;
+}
+
+.donor-details p {
+    margin: 0.25rem 0;
+}
+
+/* Footer section */
+.receipt-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--gray-800);
+    text-align: center;
+}
+
+.receipt-id {
+    font-size: 0.6rem;
+    color: var(--gray-600);
+    margin: 0 0 0.5rem 0;
+}
+
+.tax-notice {
+    font-size: 0.6rem;
+    color: var(--gray-600);
+    line-height: 1.4;
+    margin: 0;
+    font-style: italic;
+}
+
+/* Print styles for A5 - FIXED FOR SINGLE PAGE */
+@media print {
+    @page {
+        size: A5 portrait;
+        margin: 12mm;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        background: white !important;
+    }
+    
+    .container {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+    }
+    
+    /* Hide everything except the receipt */
+    body * {
+        display: none !important;
+    }
+    
+    .receipt-a5,
+    .receipt-a5 * {
+        display: block !important;
+        visibility: visible !important;
+    }
+    
+    .receipt-a5 {
+        position: relative !important;
+        width: 148mm !important;
+        min-height: 210mm !important;
+        margin: 0 !important;
+        padding: 12mm !important;
+        box-shadow: none !important;
+        border: none !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+        overflow: visible !important;
+    }
+    
+    /* Ensure the receipt doesn't get cut */
+    .receipt-a5 > * {
+        page-break-inside: avoid !important;
+        page-break-before: avoid !important;
+        page-break-after: avoid !important;
+    }
+    
+    /* Hide non-print elements */
+    .no-print,
+    .receipt-actions {
+        display: none !important;
+    }
+    
+    /* Optimize for black and white printing */
+    .receipt-header {
+        border-bottom: 2px solid #000 !important;
+    }
+    
+    .amount-section,
+    .detail-item,
+    .donor-section {
+        background: none !important;
+        border: 1px solid #000 !important;
+    }
+    
+    .receipt-footer {
+        border-top: 2px solid #000 !important;
+    }
+    
+    /* Ensure good contrast */
+    .detail-label,
+    .detail-value,
+    .donor-details,
+    .org-contact {
+        color: #000 !important;
+    }
+    
+    /* Remove colors for printing */
+    .status-badge {
+        background: #000 !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Font adjustments for print */
+    .amount {
+        font-size: 1.75rem !important;
+    }
+    
+    .receipt-title {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* Action buttons (screen only) */
+.receipt-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-receipt {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border: var(--border);
+    background: white;
+    color: var(--gray-700);
+    cursor: pointer;
+}
+
+.btn-receipt:hover {
+    background: var(--gray-100);
+    text-decoration: none;
+    color: var(--gray-800);
+}
+
+.btn-receipt.primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.btn-receipt.primary:hover {
+    background: var(--primary);
+    opacity: 0.9;
+    color: white;
+}
+
+/* Mobile responsiveness for screen viewing */
+@media (max-width: 768px) {
+    .receipt-a5 {
+        margin: 0 1rem;
+        padding: 1rem;
+        max-width: 100%;
+        min-height: auto;
+        box-shadow: none;
+        border: none;
+    }
+    
+    .receipt-header {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .org-logo {
+        margin: 0 auto;
+    }
+    
+    .org-info {
+        text-align: center;
+    }
+    
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .receipt-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-receipt {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Screen-only adjustments */
+@media screen {
+    .receipt-a5 {
+        margin: 1rem auto;
+    }
+}
+
+/* PDF-specific styles */
+@media print, (color-gamut: p3) {
+    /* Ensure visibility when printing */
+    .receipt-a5 {
+        break-inside: avoid;
+        break-after: avoid;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- A5 Receipt -->
+    <div class="receipt-a5" id="printableReceipt">
+        <!-- Header with Logo and Organization Info -->
+        <div class="receipt-header">
+            <div class="org-logo">
+                <img src="{{ website_settings.logo.url }}" alt="{{ website_settings.name|default:'Youth Shield Foundation' }}" height="100">
+            </div>
+            <div class="org-info">
+                <h2 class="org-name">Youth Shield Foundation</h2>
+                <p class="org-tagline">Shielding Youth, Empowering Futures</p>
+                <div class="org-contact">
+                    <p>Adress: {{ website_settings.address|default:"P.O Box 1125 - 30100, Eldoret" }}</p>
+                    <p>Email: {{ website_settings.contact_email|default:"info@youthshieldfoundation.org" }}</p>
+                    <p>Phone: {{ website_settings.contact_phone|default:"+254 797 252 133" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Title -->
+        <div class="receipt-title-section">
+            <h1 class="receipt-title">DONATION RECEIPT</h1>
+            <p class="receipt-subtitle">Official Tax Document</p>
+            <span class="status-badge">
+                <i class="fas fa-check-circle me-1"></i> PAID
+            </span>
+        </div>
+
+        <!-- Receipt Content -->
+        <div class="receipt-content">
+            <!-- Amount Section -->
+            <div class="amount-section">
+                <div class="amount-label">Donation Amount</div>
+                <div class="amount">KES {{ donation.amount }}</div>
+            </div>
+
+            <!-- Transaction Details Grid -->
+            <div class="details-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Receipt No.</div>
+                    <div class="detail-value">YSF/TRX-00{{ donation.receipt_number|default:donation.transaction_id|truncatechars:15 }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Date & Time</div>
+                    <div class="detail-value">{{ donation.created_at|date:"M j, Y · g:i A" }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Payment Method</div>
+                    <div class="detail-value">{{ donation.payment_method|upper }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Transaction ID</div>
+                    <div class="detail-value">{{ donation.transaction_id|truncatechars:15 }}</div>
+                </div>
+            </div>
+
+            <!-- Donor Information -->
+            <div class="donor-section">
+                <div class="donor-title">Donor Information</div>
+                <div class="donor-details">
+                    {% if user.is_authenticated %}
+                    <p><strong>Name:</strong> {{ user.get_full_name|default:"Anonymous Donor" }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    {% else %}
+                    <p><strong>Name:</strong> Anonymous Donor</p>
+                    <p><strong>Email:</strong> Not provided</p>
+                    {% endif %}
+                    <p><strong>Payment Status:</strong> Completed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Footer -->
+        <div class="receipt-footer">
+            <div class="receipt-id">
+                Receipt ID: {{ donation.receipt_number|default:donation.transaction_id }} | Generated: {% now "M j, Y H:i" %}
+            </div>
+            <p class="tax-notice">
+                This is an official receipt for tax purposes. Your donation is tax-deductible to the extent allowed by law.
+                Please retain this document for your records.
+            </p>
+        </div>
+    </div>
+
+    <!-- Action Buttons (Hidden when printing) -->
+    <div class="receipt-actions no-print">
+        <button onclick="printReceipt()" class="btn-receipt">
+            <i class="fas fa-print"></i> Print Receipt
+        </button>
+        <button id="downloadReceipt" class="btn-receipt primary">
+            <i class="fas fa-download"></i> Download PDF
+        </button>
+        <a href="{% url 'donations:history' %}" class="btn-receipt">
+            <i class="fas fa-history"></i> View History
+        </a>
+        <a href="{% url 'core:home' %}" class="btn-receipt">
+            <i class="fas fa-home"></i> Return Home
+        </a>
+    </div>
+</div> <br> <br>
+
+<script>
+// Make sure html2pdf is loaded
+function ensureHtml2Pdf() {
+    return new Promise((resolve, reject) => {
+        if (typeof html2pdf !== 'undefined') {
+            resolve(html2pdf);
+        } else {
+            // Load html2pdf from CDN
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            script.onload = () => resolve(window.html2pdf);
+            script.onerror = reject;
+            document.head.appendChild(script);
+        }
+    });
+}
+
+// Print function that ensures single page
+function printReceipt() {
+    const originalStyles = document.querySelectorAll('style, link[rel="stylesheet"]');
+    const printWindow = window.open('', '_blank');
+    
+    // Get the receipt HTML
+    const receipt = document.getElementById('printableReceipt').cloneNode(true);
+    
+    // Create print-friendly HTML
+    const printHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Donation Receipt - {{ donation.transaction_id }}</title>
+            <style>
+                @page {
+                    size: A5 portrait;
+                    margin: 12mm;
+                }
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: Arial, sans-serif;
+                    background: white;
+                }
+                .receipt-a5 {
+                    width: 148mm;
+                    min-height: 210mm;
+                    margin: 0;
+                    padding: 12mm;
+                    box-sizing: border-box;
+                }
+                /* Add all the print styles from above */
+                .receipt-header {
+                    display: grid;
+                    grid-template-columns: auto 1fr;
+                    gap: 1.5rem;
+                    align-items: start;
+                    padding-bottom: 1rem;
+                    border-bottom: 2px solid #000;
+                    margin-bottom: 1.5rem;
+                }
+                .org-logo {
+                    width: 48px;
+                    height: 48px;
+                    background: #000;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 1.5rem;
+                }
+                .org-name {
+                    font-size: 1.25rem;
+                    font-weight: 700;
+                    margin: 0 0 0.25rem 0;
+                }
+                .receipt-title {
+                    font-size: 1.75rem;
+                    font-weight: 700;
+                    margin: 0 0 0.25rem 0;
+                    text-align: center;
+                }
+                .amount {
+                    font-size: 2rem;
+                    font-weight: 700;
+                    margin: 0;
+                    text-align: center;
+                }
+                .details-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 0.75rem;
+                    margin: 1.5rem 0;
+                }
+                .detail-item {
+                    padding: 0.75rem;
+                    border: 1px solid #000;
+                    border-radius: 6px;
+                }
+                .status-badge {
+                    background: #000;
+                    color: white;
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 12px;
+                    font-size: 0.7rem;
+                    display: inline-block;
+                    text-align: center;
+                }
+            </style>
+        </head>
+        <body>
+            ${receipt.outerHTML}
+        </body>
+        </html>
+    `;
+    
+    printWindow.document.write(printHTML);
+    printWindow.document.close();
+    
+    // Wait for content to load, then print
+    printWindow.onload = function() {
+        printWindow.focus();
+        printWindow.print();
+    };
+}
+
+// Download PDF with better error handling
+async function downloadPDF() {
+    const downloadBtn = document.getElementById('downloadReceipt');
+    const originalHTML = downloadBtn.innerHTML;
+    
+    try {
+        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+        downloadBtn.disabled = true;
+        
+        const html2pdf = await ensureHtml2Pdf();
+        const element = document.getElementById('printableReceipt');
+        
+        // Simple options for reliable PDF generation
+        const opt = {
+            margin:        [10, 10, 10, 10], // mm
+            filename:      `receipt_${Date.now()}.pdf`,
+            image:         { type: 'jpeg', quality: 0.98 },
+            html2canvas:   { 
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                backgroundColor: '#FFFFFF'
+            },
+            jsPDF:         { 
+                unit: 'mm', 
+                format: [148, 210], // A5 dimensions
+                orientation: 'portrait'
+            },
+            pagebreak:     { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+        
+        await html2pdf().set(opt).from(element).save();
+        
+    } catch (error) {
+        console.error('PDF generation failed:', error);
+        alert('PDF generation failed. Please try printing instead.');
+        printReceipt(); // Fallback to print
+    } finally {
+        downloadBtn.innerHTML = originalHTML;
+        downloadBtn.disabled = false;
+    }
+}
+
+// Alternative simple PDF download using browser print to PDF
+function downloadSimplePDF() {
+    const originalTitle = document.title;
+    document.title = `Receipt_${Date.now()}`;
+    
+    // Open print dialog with "Save as PDF" option
+    window.print();
+    
+    // Restore title after a delay
+    setTimeout(() => {
+        document.title = originalTitle;
+    }, 1000);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadBtn = document.getElementById('downloadReceipt');
+    const printBtn = document.querySelector('button[onclick="printReceipt()"]');
+    
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadPDF);
+    }
+    
+    if (printBtn) {
+        printBtn.onclick = printReceipt;
+    }
+    
+    // Also support direct browser print (Ctrl+P)
+    window.addEventListener('afterprint', function() {
+        console.log('Printing completed');
+    });
+});
+
+// Fallback: If html2pdf doesn't load, use browser's print to PDF
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        if (typeof html2pdf === 'undefined') {
+            const downloadBtn = document.getElementById('downloadReceipt');
+            if (downloadBtn) {
+                downloadBtn.onclick = downloadSimplePDF;
+                downloadBtn.title = "Uses browser's Save as PDF feature";
+            }
+        }
+    }, 2000);
+});
+</script>
+{% endblock %}

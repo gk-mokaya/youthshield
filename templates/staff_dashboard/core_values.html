@@ -1,0 +1,282 @@
+{% extends 'staff_dashboard/base.html' %}
+
+{% block title %}Core Values - Staff Portal{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Core Values</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Core Values Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addValueModal">
+            <i class="fas fa-plus me-1"></i> Add Core Value
+        </button>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Total Values</h6>
+                <h2 class="mb-0">{{ core_values.count }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Active Values</h6>
+                <h2 class="mb-0">{{ active_values_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Core Values Grid -->
+<div class="row">
+    {% for value in core_values %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 {% if not value.is_active %}border-warning{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">
+                            <i class="{{ value.icon_class }} me-2"></i>{{ value.name }}
+                        </h5>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" 
+                               id="toggle-{{ value.id }}" {% if value.is_active %}checked{% endif %}
+                               onchange="toggleCoreValue({{ value.id }}, this)">
+                    </div>
+                </div>
+                <p class="card-text">{{ value.description }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-secondary">Order: {{ value.order }}</span>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-warning" 
+                                onclick="editCoreValue({{ value.id }})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" 
+                                onclick="deleteCoreValue({{ value.id }})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-star fa-3x text-muted mb-3"></i>
+                <h4>No Core Values Found</h4>
+                <p class="text-muted">Add your organization's core values to get started.</p>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addValueModal">
+                    <i class="fas fa-plus me-1"></i> Add First Core Value
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add Core Value Modal -->
+<div class="modal fade" id="addValueModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Core Value</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addValueForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="valueName" class="form-label">Name *</label>
+                        <input type="text" class="form-control" id="valueName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="valueDescription" class="form-label">Description *</label>
+                        <textarea class="form-control" id="valueDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="valueIcon" class="form-label">Icon Class</label>
+                        <input type="text" class="form-control" id="valueIcon" 
+                               value="fas fa-star" placeholder="e.g., fas fa-heart">
+                        <small class="text-muted">Use Font Awesome icon classes</small>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="valueOrder" class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="valueOrder" value="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="valueActive" checked>
+                                <label class="form-check-label" for="valueActive">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Core Value</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Core Value Modal -->
+<div class="modal fade" id="editValueModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Core Value</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editValueForm">
+                {% csrf_token %}
+                <input type="hidden" id="editValueId">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editValueName" class="form-label">Name *</label>
+                        <input type="text" class="form-control" id="editValueName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editValueDescription" class="form-label">Description *</label>
+                        <textarea class="form-control" id="editValueDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editValueIcon" class="form-label">Icon Class</label>
+                        <input type="text" class="form-control" id="editValueIcon">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editValueOrder" class="form-label">Display Order</label>
+                            <input type="number" class="form-control" id="editValueOrder">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="editValueActive">
+                                <label class="form-check-label" for="editValueActive">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Core Value</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentEditValueId = null;
+
+// Add Core Value
+$('#addValueForm').submit(function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        name: $('#valueName').val(),
+        description: $('#valueDescription').val(),
+        icon_class: $('#valueIcon').val(),
+        order: parseInt($('#valueOrder').val()),
+        is_active: $('#valueActive').is(':checked')
+    };
+    
+    $.ajax({
+        url: "{% url 'staff_dashboard:create_core_value' %}",
+        method: 'POST',
+        data: JSON.stringify(formData),
+        contentType: 'application/json',
+        success: function(response) {
+            if (response.success) {
+                showToast('Core value added successfully', 'success');
+                $('#addValueModal').modal('hide');
+                location.reload();
+            } else {
+                showToast('Error: ' + response.message, 'error');
+            }
+        },
+        error: function() {
+            showToast('Failed to add core value', 'error');
+        }
+    });
+});
+
+// Edit Core Value
+function editCoreValue(valueId) {
+    // Load value data via AJAX or use Django template data
+    // For simplicity, we'll reload the page with edit mode
+    window.location.href = `/staff-dashboard/core-values/${valueId}/update/`;
+}
+
+// Toggle Core Value Status
+function toggleCoreValue(valueId, checkbox) {
+    const isActive = checkbox.checked;
+    
+    $.ajax({
+        url: `/staff-dashboard/core-values/${valueId}/toggle/`,
+        method: 'POST',
+        data: JSON.stringify({ is_active: isActive }),
+        contentType: 'application/json',
+        success: function(response) {
+            if (response.success) {
+                showToast(response.message, 'success');
+            } else {
+                checkbox.checked = !isActive;
+                showToast('Error: ' + response.message, 'error');
+            }
+        },
+        error: function() {
+            checkbox.checked = !isActive;
+            showToast('Failed to update status', 'error');
+        }
+    });
+}
+
+// Delete Core Value
+function deleteCoreValue(valueId) {
+    if (confirm('Are you sure you want to delete this core value?')) {
+        $.ajax({
+            url: `/staff-dashboard/core-values/${valueId}/delete/`,
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showToast('Core value deleted successfully', 'success');
+                    location.reload();
+                } else {
+                    showToast('Error: ' + response.message, 'error');
+                }
+            },
+            error: function() {
+                showToast('Failed to delete core value', 'error');
+            }
+        });
+    }
+}
+
+// Reset add form when modal closes
+$('#addValueModal').on('hidden.bs.modal', function() {
+    $('#addValueForm')[0].reset();
+});
+</script>
+{% endblock %}

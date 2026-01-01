@@ -1,0 +1,789 @@
+{% extends 'base.html' %}
+{% block title %}History - Youthshieldfoundation{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Minimal color palette */
+:root {
+    --primary: #4f46e5;
+    --primary-light: #818cf8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+}
+
+/* Header */
+.history-header {
+    background: var(--gray-50);
+    padding: 2rem 0;
+    text-align: center;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.history-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.history-header p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+/* Filters */
+.filters-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 0.25rem;
+}
+
+.filter-select,
+.filter-input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background: white;
+    color: var(--gray-800);
+    min-width: 120px;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.filter-btn:hover {
+    background: var(--primary-light);
+}
+
+.filter-btn.secondary {
+    background: white;
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+}
+
+.filter-btn.secondary:hover {
+    background: var(--gray-50);
+}
+
+/* Table */
+.history-table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+thead {
+    background: var(--gray-50);
+}
+
+th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--gray-200);
+    user-select: none;
+}
+
+.sortable {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.sortable:hover {
+    color: var(--gray-800);
+}
+
+.sortable i {
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+    opacity: 0.5;
+}
+
+td {
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover {
+    background: var(--gray-50);
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-failed {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Payment method */
+.payment-method {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--gray-100);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.payment-method i {
+    font-size: 0.875rem;
+}
+
+/* Amount */
+.amount-cell {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+/* Actions */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--gray-700);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: var(--gray-200);
+    text-decoration: none;
+    color: var(--gray-800);
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    color: var(--gray-400);
+    margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.page-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 4px;
+    background: white;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.page-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+}
+
+.page-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin: 0 1rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .history-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .filters-container {
+        padding: 1rem;
+        margin: 0 -1rem 1rem;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-select,
+    .filter-input {
+        width: 100%;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .history-table {
+        margin: 0 -1rem;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    th, td {
+        padding: 0.75rem;
+    }
+    
+    .pagination {
+        flex-wrap: wrap;
+    }
+}
+
+/* Loading state */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Export buttons */
+.export-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.export-btn {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.export-btn:hover {
+    background: var(--gray-50);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="history-header">
+        <h1>Donation History</h1>
+        <p>Track your contributions and view your impact</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-container">
+        <div class="filter-group">
+            <div>
+                <div class="filter-label">Status</div>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+            
+            <div>
+                <div class="filter-label">Payment Method</div>
+                <select class="filter-select" id="methodFilter">
+                    <option value="">All Methods</option>
+                    <option value="mpesa">M-Pesa</option>
+                    <option value="paypal">PayPal</option>
+                </select>
+            </div>
+            
+            <div>
+                <div class="filter-label">Date Range</div>
+                <input type="date" class="filter-input" id="dateFrom">
+                <span style="margin: 0 0.5rem; color: var(--gray-400);">to</span>
+                <input type="date" class="filter-input" id="dateTo">
+            </div>
+            
+            <div class="export-buttons">
+                <button class="export-btn" id="exportCSV">
+                    <i class="fas fa-file-csv"></i> CSV
+                </button>
+                <button class="export-btn" id="exportPrint">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+            
+            <div class="filter-buttons" style="margin-left: auto;">
+                <button class="filter-btn secondary" id="clearFilters">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+                <button class="filter-btn" id="applyFilters">
+                    <i class="fas fa-filter"></i> Apply
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="history-table">
+        <div class="table-container">
+            <table id="donationsTable">
+                <thead>
+                    <tr>
+                        <th class="sortable" data-sort="date">
+                            Date <i class="fas fa-sort"></i>
+                        </th>
+                        <th class="sortable" data-sort="amount">
+                            Amount <i class="fas fa-sort"></i>
+                        </th>
+                        <th>Payment Method</th>
+                        <th class="sortable" data-sort="status">
+                            Status <i class="fas fa-sort"></i>
+                        </th>
+                        <th>Transaction ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% if donations %}
+                        {% for donation in donations %}
+                        <tr data-status="{{ donation.status }}" data-method="{{ donation.payment_method }}" data-date="{{ donation.created_at|date:'Y-m-d' }}">
+                            <td>{{ donation.created_at|date:"M j, Y" }}</td>
+                            <td class="amount-cell">KES {{ donation.amount }}</td>
+                            <td>
+                                <span class="payment-method">
+                                    {% if donation.payment_method == 'mpesa' %}
+                                        <i class="fas fa-mobile-alt"></i>
+                                    {% else %}
+                                        <i class="fas fa-paypal"></i>
+                                    {% endif %}
+                                    {{ donation.payment_method|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ donation.status }}">
+                                    {{ donation.status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <span style="font-family: monospace; font-size: 0.75rem;">
+                                    {{ donation.transaction_id|truncatechars:15 }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if donation.status == 'completed' %}
+                                    <a href="{% url 'donations:receipt' donation.id %}" class="action-btn">
+                                        <i class="fas fa-receipt"></i> Receipt
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-history"></i>
+                                    <h4>No Donations Found</h4>
+                                    <p>You haven't made any donations yet.</p>
+                                    <a href="{% url 'donations:donate' %}" class="filter-btn">
+                                        <i class="fas fa-heart me-1"></i> Make Your First Donation
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if donations and donations.paginator.num_pages > 1 %}
+        <div class="pagination">
+            <button class="page-btn" id="prevPage" {% if not donations.has_previous %}disabled{% endif %}>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <span class="page-info">
+                Page {{ donations.number }} of {{ donations.paginator.num_pages }}
+            </span>
+            
+            <button class="page-btn" id="nextPage" {% if not donations.has_next %}disabled{% endif %}>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <a href="{% url 'donations:donate' %}" class="filter-btn">
+            <i class="fas fa-heart me-1"></i> Make Donation
+        </a>
+        <a href="{% url 'core:home' %}" class="filter-btn secondary">
+            <i class="fas fa-home me-1"></i> Back to Home
+        </a>
+    </div>
+</div> <br> <br>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.getElementById('donationsTable');
+    const tableBody = document.getElementById('tableBody');
+    const rows = Array.from(tableBody.querySelectorAll('tr[data-status]'));
+    let sortColumn = 'date';
+    let sortDirection = 'desc';
+
+    // Filter elements
+    const statusFilter = document.getElementById('statusFilter');
+    const methodFilter = document.getElementById('methodFilter');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    const applyFilters = document.getElementById('applyFilters');
+    const clearFilters = document.getElementById('clearFilters');
+    const exportCSV = document.getElementById('exportCSV');
+    const exportPrint = document.getElementById('exportPrint');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+
+    // Set today as default max date
+    const today = new Date().toISOString().split('T')[0];
+    dateFrom.max = today;
+    dateTo.max = today;
+
+    // Sort functionality
+    document.querySelectorAll('.sortable').forEach(header => {
+        header.addEventListener('click', () => {
+            const column = header.dataset.sort;
+            
+            // Update sort direction
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'desc';
+            }
+            
+            // Update sort indicators
+            updateSortIndicators();
+            
+            // Sort and filter rows
+            applyFilterAndSort();
+        });
+    });
+
+    function updateSortIndicators() {
+        document.querySelectorAll('.sortable i').forEach(icon => {
+            icon.className = 'fas fa-sort';
+        });
+        
+        const currentHeader = document.querySelector(`[data-sort="${sortColumn}"]`);
+        if (currentHeader) {
+            const icon = currentHeader.querySelector('i');
+            icon.className = `fas fa-sort-${sortDirection === 'asc' ? 'up' : 'down'}`;
+        }
+    }
+
+    // Filter and sort rows
+    function applyFilterAndSort() {
+        const status = statusFilter.value;
+        const method = methodFilter.value;
+        const fromDate = dateFrom.value;
+        const toDate = dateTo.value;
+
+        const filteredRows = rows.filter(row => {
+            const rowStatus = row.dataset.status;
+            const rowMethod = row.dataset.method;
+            const rowDate = row.dataset.date;
+
+            // Status filter
+            if (status && rowStatus !== status) return false;
+            
+            // Method filter
+            if (method && rowMethod !== method) return false;
+            
+            // Date range filter
+            if (fromDate && rowDate < fromDate) return false;
+            if (toDate && rowDate > toDate) return false;
+            
+            return true;
+        });
+
+        // Sort filtered rows
+        filteredRows.sort((a, b) => {
+            let aValue, bValue;
+            
+            switch (sortColumn) {
+                case 'date':
+                    aValue = a.dataset.date;
+                    bValue = b.dataset.date;
+                    break;
+                case 'amount':
+                    aValue = parseFloat(a.cells[1].textContent.replace('KES ', ''));
+                    bValue = parseFloat(b.cells[1].textContent.replace('KES ', ''));
+                    break;
+                case 'status':
+                    aValue = a.dataset.status;
+                    bValue = b.dataset.status;
+                    break;
+                default:
+                    aValue = a.cells[0].textContent;
+                    bValue = b.cells[0].textContent;
+            }
+            
+            if (sortDirection === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+
+        // Update table
+        tableBody.innerHTML = '';
+        if (filteredRows.length > 0) {
+            filteredRows.forEach(row => tableBody.appendChild(row));
+            // Hide empty state row if present
+            const emptyRow = tableBody.querySelector('td[colspan]');
+            if (emptyRow) emptyRow.parentElement.remove();
+        } else {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h4>No Matching Donations</h4>
+                            <p>Try adjusting your filters</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Apply filters button
+    applyFilters.addEventListener('click', applyFilterAndSort);
+
+    // Clear filters button
+    clearFilters.addEventListener('click', () => {
+        statusFilter.value = '';
+        methodFilter.value = '';
+        dateFrom.value = '';
+        dateTo.value = '';
+        applyFilterAndSort();
+    });
+
+    // Enter key in date fields triggers filter
+    [dateFrom, dateTo].forEach(input => {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyFilterAndSort();
+        });
+    });
+
+    // Export to CSV
+    exportCSV.addEventListener('click', () => {
+        const rows = tableBody.querySelectorAll('tr[data-status]');
+        if (rows.length === 0) {
+            alert('No data to export');
+            return;
+        }
+
+        const csv = [
+            ['Date', 'Amount', 'Payment Method', 'Status', 'Transaction ID'],
+            ...Array.from(rows).map(row => [
+                row.cells[0].textContent,
+                row.cells[1].textContent,
+                row.cells[2].textContent.trim(),
+                row.cells[3].textContent,
+                row.cells[4].textContent.trim()
+            ])
+        ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `donations_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    });
+
+    // Print table
+    exportPrint.addEventListener('click', () => {
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Donation History</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th { background: #f3f4f6; padding: 10px; text-align: left; }
+                        td { padding: 8px; border-bottom: 1px solid #e5e7eb; }
+                        h1 { color: #1f2937; }
+                        .footer { margin-top: 20px; font-size: 12px; color: #6b7280; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Donation History</h1>
+                    <p>Generated on ${new Date().toLocaleDateString()}</p>
+                    ${table.outerHTML}
+                    <div class="footer">
+                        <p>This is an official record of your donations.</p>
+                    </div>
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+    });
+
+    // Pagination
+    if (prevPage) {
+        prevPage.addEventListener('click', () => {
+            const currentPage = parseInt('{{ donations.number }}');
+            if (currentPage > 1) {
+                window.location.href = `?page=${currentPage - 1}`;
+            }
+        });
+    }
+
+    if (nextPage) {
+        nextPage.addEventListener('click', () => {
+            const currentPage = parseInt('{{ donations.number }}');
+            const totalPages = parseInt('{{ donations.paginator.num_pages }}');
+            if (currentPage < totalPages) {
+                window.location.href = `?page=${currentPage + 1}`;
+            }
+        });
+    }
+
+    // Initialize sort indicators
+    updateSortIndicators();
+});
+</script>
+{% endblock %}

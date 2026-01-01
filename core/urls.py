@@ -1,0 +1,15 @@
+from django.urls import path
+from . import views
+
+app_name = 'core'
+
+urlpatterns = [
+    path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('programs/', views.programs, name='programs'),
+    
+
+    path('testimonials/', views.testimonials_page, name='testimonials'),
+    path('contact/', views.contact, name='contact'),
+    path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+]

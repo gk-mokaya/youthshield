@@ -1,0 +1,1135 @@
+/* Custom styles for Youth Shield Foundation */
+
+/* CSS Variables */
+:root {
+    --primary-blue: #1a4b8c;
+    --secondary-blue: #2c6cb0;
+    --accent-yellow: #f9c42d;
+    --accent-orange: #e67e22;
+    --success-green: #28a745;
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+    --light-text: #ecf0f1;
+    --warning-orange: #e67e22;
+    --danger-red: #e74c3c;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+    --border-radius: 15px;
+}
+
+/* Base Styles */
+body {
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+main {
+    min-height: calc(100vh - 200px);
+    padding-top: 100px;
+}
+
+.container-fluid {
+    padding-top: 100px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes loader-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes loader-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+@keyframes loader-text-fade {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Utility Classes */
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.fade-in-left {
+    animation: fadeInLeft 0.8s ease-out;
+}
+
+.fade-in-right {
+    animation: fadeInRight 0.8s ease-out;
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(to right, #08012e, #000000) !important;
+    box-shadow: 0 2px 10px rgba(136, 7, 7, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    width: 100%;
+}
+
+.navbar-text,
+.navbar-brand {
+    color: var(--secondary-blue) !important;
+    font-weight: bold;
+}
+
+.nav-link {
+    color: rgba(0, 123, 255, 0.8) !important;
+    transition: var(--transition);
+    font-weight: bold;
+}
+
+.nav-link:hover {
+    color: var(--secondary-blue) !important;
+}
+
+.text-muted {
+    color: rgba(0, 26, 255, 0.6) !important;
+    font-weight: bold;
+}
+
+/* Buttons */
+.btn-donate {
+    background-color: var(--success-green);
+    border-color: var(--success-green);
+    color: white;
+}
+
+.btn-donate:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.amount-btn {
+    flex: 1;
+    min-width: 80px;
+}
+
+.amount-btn.active {
+    background-color: var(--success-green);
+    border-color: var(--success-green);
+}
+
+/* Forms */
+.form-control:focus {
+    border-color: var(--success-green);
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* Alerts */
+.alert {
+    border-radius: 5px;
+}
+
+/* ===== ENHANCED CARD STYLES ===== */
+
+/* Cards - Consolidated Card Styles - ENHANCED */
+.card,
+.appealing-card,
+.core-value-card,
+.board-director-card,
+.executive-committee-card,
+.value-card,
+.objective-card,
+.testimonial-card,
+.service-card,
+.objective-card,
+.program-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    padding: 25px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(26, 75, 140, 0.1);
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.card::before,
+.appealing-card::before,
+.core-values-section .value-card::before,
+.objectives-section .objective-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--accent-yellow));
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.card:hover,
+.appealing-card:hover,
+.core-value-card:hover,
+.board-director-card:hover,
+.executive-committee-card:hover,
+.value-card:hover,
+.objective-card:hover,
+.testimonial-card:hover,
+.service-card:hover,
+.objective-card:hover,
+.program-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 15px 35px rgba(26, 75, 140, 0.2) !important;
+    border-color: var(--primary-blue);
+    transition: all 0.3s ease !important;
+}
+
+/* Card Content - ENHANCED */
+.card-body,
+.appealing-card p,
+.core-value-description,
+.board-director-content {
+    padding: 0 !important;
+    margin: 0;
+}
+
+.card h4,
+.appealing-card h4,
+.core-value-title,
+.core-values-section .value-card h4,
+.objectives-section .objective-card h4,
+.service-title,
+.objective-title,
+.program-title {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 1.25rem;
+}
+
+.card p,
+.appealing-card p,
+.core-value-description,
+.core-values-section .value-card p,
+.objectives-section .objective-card p,
+.service-description,
+.objective-description,
+.program-description {
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Card Icons - ENHANCED */
+.card-icon,
+.appealing-card .card-icon,
+.core-value-icon,
+.core-values-section .value-icon,
+.objectives-section .objective-card .card-icon,
+.service-icon,
+.objective-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-yellow);
+    font-size: 24px;
+    margin: 0 auto 20px;
+    box-shadow: 0 6px 20px rgba(26, 75, 140, 0.3);
+    transition: var(--transition);
+}
+
+.card:hover .card-icon,
+.appealing-card:hover .card-icon,
+.core-value-card:hover .core-value-icon,
+.value-card:hover .value-icon,
+.objective-card:hover .card-icon,
+.service-card:hover .service-icon,
+.objective-card:hover .objective-icon {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 10px 30px rgba(26, 75, 140, 0.4);
+}
+
+/* ===== ENHANCED TESTIMONIAL CARDS ===== */
+
+.testimonial-card {
+    padding: 20px !important;
+    margin-bottom: 30px;
+    height: auto !important;
+    border-left: 4px solid var(--accent-yellow);
+}
+
+/* Make profile images small (icon size) */
+.testimonial-avatar,
+.testimonial-avatar-small {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-yellow);
+    margin-right: 15px !important;
+    transition: var(--transition);
+}
+
+.testimonial-card:hover .testimonial-avatar {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(249, 196, 45, 0.4);
+}
+
+/* Adjust testimonial header layout */
+.testimonial-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px !important;
+}
+
+.testimonial-info h5 {
+    font-size: 1.1rem !important;
+    margin-bottom: 5px !important;
+    color: var(--primary-blue);
+}
+
+.testimonial-content {
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    margin-bottom: 15px !important;
+    padding: 0 10px !important;
+    color: #555;
+    font-style: italic;
+}
+
+.testimonial-content::before {
+    content: '"';
+    font-size: 32px;
+    color: var(--accent-yellow);
+    opacity: 0.5;
+    margin-right: 5px;
+}
+
+/* Make rating stars smaller */
+.testimonial-rating .star {
+    font-size: 16px !important;
+    color: var(--accent-yellow);
+    margin-right: 2px;
+}
+
+/* Testimonial Page Layout Fix */
+.testimonials-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+.testimonials-page-container .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.testimonials-page-container .col-md-8,
+.testimonials-page-container .col-lg-6,
+.testimonials-page-container .col-xl-4 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+
+/* ===== ENHANCED PROGRAM CARDS ===== */
+
+/* Programs Grid - ONLY 3 CARDS PER ROW */
+.programs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* FIX: Exactly 3 cards per row */
+    gap: 30px !important; /* FIX: Increased gap for better spacing */
+    margin-bottom: 50px !important;
+}
+
+.program-card {
+    height: 420px !important; /* FIX: Increased height for bigger cards */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-bottom: 0; /* Remove bottom margin since gap handles it */
+    border: none;
+    box-shadow: 0 6px 20px rgba(26, 75, 140, 0.15) !important;
+}
+
+/* Increase image space */
+.program-image {
+    height: 200px !important; /* FIX: More space for image */
+    min-height: 200px !important;
+    background-size: cover !important;
+    background-position: center !important;
+    position: relative;
+    transition: transform 0.5s ease;
+}
+
+.program-card:hover .program-image {
+    transform: scale(1.05);
+}
+
+/* Add overlay for better text readability */
+.program-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.4) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.program-card:hover .program-image::after {
+    opacity: 1;
+}
+
+/* Make category badge more visible */
+.program-category {
+    position: absolute !important;
+    top: 15px;
+    right: 15px;
+    background: var(--accent-yellow) !important;
+    color: var(--primary-blue) !important;
+    padding: 8px 18px !important;
+    border-radius: 20px !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: var(--transition);
+}
+
+.program-card:hover .program-category {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+/* Program content area - optimized space */
+.program-content {
+    padding: 25px !important; /* FIX: Increased padding */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+}
+
+/* Title with limited lines */
+.program-title {
+    font-size: 1.3rem !important; /* FIX: Larger title */
+    font-weight: 800 !important;
+    margin-bottom: 12px !important;
+    color: var(--primary-blue) !important;
+    line-height: 1.3 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 3.2em;
+}
+
+/* Description with limited lines */
+.program-description {
+    font-size: 1rem !important; /* FIX: Larger text */
+    line-height: 1.6 !important;
+    color: #666 !important;
+    margin-bottom: 20px !important;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Compact details section */
+.program-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px !important;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.program-detail {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem !important;
+    color: #777 !important;
+    background: rgba(26, 75, 140, 0.08);
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: var(--transition);
+}
+
+.program-card:hover .program-detail {
+    background: rgba(26, 75, 140, 0.12);
+}
+
+.program-detail i {
+    margin-right: 6px;
+    color: var(--primary-blue) !important;
+    font-size: 1rem;
+}
+
+/* Footer with button - FIXED READ MORE BUTTON */
+.program-link {
+    margin-top: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: var(--primary-blue) !important;
+    color: white !important;
+    padding: 12px 25px !important; /* FIX: Increased padding */
+    border-radius: 25px !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important; /* FIX: Larger text */
+    text-decoration: none !important;
+    transition: all 0.3s ease;
+    border: none !important;
+    min-height: 46px;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.program-link:hover {
+    background: var(--secondary-blue) !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 20px rgba(26, 75, 140, 0.4) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.program-link i {
+    margin-left: 8px;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.program-link:hover i {
+    transform: translateX(5px);
+}
+
+/* ===== SERVICES AND OBJECTIVES SECTIONS - BETTER SPACING ===== */
+
+/* Section spacing */
+.services-section,
+.objectives-section {
+    margin-bottom: 60px !important; /* FIX: Increased spacing between sections */
+    padding-top: 40px !important;
+    padding-bottom: 40px !important;
+}
+
+/* Services Grid */
+.services-grid,
+.objectives-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* FIX: 3 cards per row */
+    gap: 30px !important; /* FIX: Increased gap */
+    margin-top: 30px !important;
+}
+
+.service-card,
+.objective-card {
+    padding: 30px !important; /* FIX: Increased padding */
+    margin-bottom: 0; /* Remove bottom margin since gap handles it */
+    border-top: 4px solid var(--primary-blue);
+    transition: all 0.3s ease;
+    height: 280px; /* Fixed height for consistency */
+    display: flex;
+    flex-direction: column;
+}
+
+.service-card:hover,
+.objective-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(26, 75, 140, 0.15);
+    border-top-color: var(--accent-yellow);
+}
+
+/* Service/Objective Icons */
+.service-icon,
+.objective-icon {
+    width: 80px !important; /* FIX: Larger icons */
+    height: 80px !important;
+    font-size: 28px !important;
+    margin-bottom: 25px !important;
+}
+
+.service-title,
+.objective-title {
+    font-size: 1.3rem !important; /* FIX: Larger titles */
+    margin-bottom: 15px !important;
+}
+
+.service-description,
+.objective-description {
+    font-size: 1rem !important; /* FIX: Larger text */
+    line-height: 1.6 !important;
+    flex: 1;
+}
+
+/* Specialized Card Styles */
+/* Executive Committee Cards */
+.executive-committee-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.executive-committee-card:hover {
+    border-color: var(--primary-blue);
+    box-shadow: 0 8px 25px rgba(26, 75, 140, 0.1);
+}
+
+.executive-committee-photo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 10px;
+    border: 3px solid var(--accent-yellow);
+    box-shadow: 0 4px 12px rgba(249, 196, 45, 0.3);
+    transition: var(--transition);
+}
+
+.executive-committee-card:hover .executive-committee-photo {
+    transform: scale(1.1);
+    box-shadow: 0 6px 18px rgba(249, 196, 45, 0.4);
+}
+
+/* Board Director Cards */
+.board-director-card {
+    background: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 25px;
+    transition: var(--transition);
+}
+
+.board-director-card:hover {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.board-director-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 15px;
+    border: 3px solid var(--accent-yellow);
+    box-shadow: 0 4px 15px rgba(249, 196, 45, 0.3);
+    transition: var(--transition);
+}
+
+.board-director-card:hover .board-director-photo {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(249, 196, 45, 0.4);
+}
+
+/* Donation Modal */
+.donation-modal .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+}
+
+.donation-amounts {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+    justify-content: center;
+}
+
+/* Back to top button */
+.back-to-top {
+    transition: var(--transition);
+    opacity: 0.8;
+}
+
+.back-to-top:hover {
+    opacity: 1;
+    transform: translateY(-3px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-blue);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-blue);
+}
+
+/* Global Loader */
+.global-loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.global-loader-overlay.show {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+
+.loader-container {
+    text-align: center;
+    color: white;
+}
+
+.loader-spinner {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 25px;
+}
+
+.spinner-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 4px solid rgba(40, 167, 69, 0.2);
+    border-top: 4px solid var(--success-green);
+    border-radius: 50%;
+    animation: loader-spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.spinner-ring:nth-child(2) {
+    animation-delay: -0.5s;
+    border-top-color: #20c997;
+}
+
+.spinner-ring:nth-child(3) {
+    animation-delay: -1s;
+    border-top-color: #17a2b8;
+}
+
+.loader-text {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.loader-icon {
+    font-size: 28px;
+    color: var(--success-green);
+    margin-right: 12px;
+    animation: loader-pulse 2s ease-in-out infinite;
+}
+
+.loader-text span {
+    display: inline-block;
+    animation: loader-text-fade 1.5s ease-in-out infinite;
+}
+
+/* Floating Donate Button */
+.floating-donate-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--success-green), #20c997);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    transition: var(--transition);
+    z-index: 1000;
+    animation: pulse 2s infinite;
+}
+
+.floating-donate-btn .donate-text {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.floating-donate-btn:hover {
+    background: linear-gradient(135deg, #218838, #1e7e34);
+    transform: scale(1.15);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.6);
+    animation: none;
+}
+
+.floating-donate-btn:active {
+    transform: scale(0.95);
+}
+
+/* Dashboard Components */
+.side-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    background: linear-gradient(180deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: var(--light-text);
+    z-index: 1000;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    overflow-y: auto;
+}
+
+.main-content {
+    margin-left: 250px;
+    transition: var(--transition);
+    min-height: 100vh;
+    padding: 100px 30px 30px 30px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border: 3px solid rgba(26, 75, 140, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--primary-blue);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+
+@media (max-width: 1200px) {
+    .programs-grid,
+    .services-grid,
+    .objectives-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 cards per row on medium screens */
+        gap: 25px !important;
+    }
+    
+    .program-card {
+        height: 400px !important;
+    }
+    
+    .program-image {
+        height: 180px !important;
+        min-height: 180px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-brand,
+    .navbar-brand span {
+        font-size: 16px !important;
+    }
+    
+    .navbar-brand img {
+        height: 45px !important;
+    }
+    
+    .dropdown-menu {
+        margin-top: 0.25rem !important;
+    }
+    
+    .floating-donate-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 20px;
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    .floating-donate-btn .donate-text {
+        font-size: 10px;
+        margin-top: 2px;
+        letter-spacing: 0.5px;
+    }
+    
+    .card,
+    .appealing-card,
+    .core-value-card,
+    .board-director-card,
+    .executive-committee-card,
+    .value-card,
+    .objective-card,
+    .testimonial-card {
+        padding: 20px !important;
+        margin-bottom: 20px;
+    }
+    
+    .card h4,
+    .appealing-card h4 {
+        font-size: 1.1rem !important;
+    }
+    
+    .card-icon,
+    .appealing-card .card-icon,
+    .core-value-icon,
+    .value-icon,
+    .objective-card .card-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 22px;
+    }
+    
+    .board-director-photo {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .executive-committee-card {
+        padding: 15px;
+    }
+    
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    /* Programs Grid - 1 card per row on mobile */
+    .programs-grid,
+    .services-grid,
+    .objectives-grid {
+        grid-template-columns: 1fr !important;
+        gap: 25px !important;
+    }
+    
+    .program-card {
+        height: 380px !important;
+        margin-bottom: 0;
+    }
+    
+    .program-image {
+        height: 160px !important;
+        min-height: 160px !important;
+    }
+    
+    .program-title {
+        font-size: 1.2rem !important;
+    }
+    
+    .program-description {
+        font-size: 0.95rem !important;
+        -webkit-line-clamp: 4;
+    }
+    
+    .program-link {
+        padding: 10px 20px !important;
+        font-size: 0.95rem !important;
+    }
+    
+    /* Testimonial cards on mobile */
+    .testimonial-card {
+        padding: 18px !important;
+    }
+    
+    .testimonial-avatar {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    .testimonial-info h5 {
+        font-size: 1rem !important;
+    }
+    
+    .testimonial-content {
+        font-size: 0.95rem !important;
+        padding: 0 8px !important;
+    }
+    
+    .program-details {
+        gap: 8px;
+    }
+    
+    .program-detail {
+        font-size: 0.8rem !important;
+        padding: 5px 10px;
+    }
+    
+    .donation-amounts {
+        justify-content: center;
+    }
+    
+    .amount-btn {
+        flex: 0 0 auto;
+        width: 75px;
+    }
+    
+    /* Section spacing on mobile */
+    .services-section,
+    .objectives-section {
+        margin-bottom: 40px !important;
+        padding-top: 30px !important;
+        padding-bottom: 30px !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .side-nav {
+        width: 70px;
+    }
+    
+    .side-nav .nav-text,
+    .side-nav .logo-text {
+        display: none;
+    }
+    
+    .main-content {
+        margin-left: 70px;
+    }
+}
+
+@media (max-width: 576px) {
+    .side-nav {
+        width: 0;
+        transform: translateX(-100%);
+    }
+    
+    .side-nav.open {
+        width: 280px;
+        transform: translateX(0);
+    }
+    
+    .side-nav.open .nav-text,
+    .side-nav.open .logo-text {
+        display: block;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        padding: 100px 20px 20px 20px;
+    }
+    
+    .mobile-menu-toggle {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 1100;
+        background: var(--primary-blue);
+        color: white;
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+        cursor: pointer;
+        font-size: 18px;
+        transition: var(--transition);
+    }
+    
+    .program-card {
+        height: 360px !important;
+    }
+    
+    .program-image {
+        height: 140px !important;
+        min-height: 140px !important;
+    }
+    
+    .program-content {
+        padding: 20px !important;
+    }
+    
+    .service-card,
+    .objective-card {
+        padding: 20px !important;
+        height: 250px;
+    }
+}

@@ -1,0 +1,818 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - Youthshieldfoundation{% endblock %}
+
+{% block content %}
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(58, 12, 163, 0.9)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        text-align: center;
+        padding: 120px 0 80px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .about-hero h1 {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+    
+    .about-hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 30px;
+        opacity: 0.95;
+    }
+    
+    .stats-section {
+        background: white;
+        padding: 60px 0;
+        margin-top: -40px;
+        position: relative;
+        z-index: 1;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        text-align: center;
+    }
+    
+    .stat-card {
+        padding: 30px 20px;
+        transition: var(--transition);
+    }
+    
+    .stat-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+        font-family: 'Montserrat', sans-serif;
+    }
+    
+    .stat-label {
+        color: var(--dark-color);
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+    
+    .mission-section {
+        padding: 100px 0;
+        background-color: #f9f9f9;
+    }
+    
+    .mission-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 60px;
+        align-items: center;
+    }
+    
+    .mission-image {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .mission-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.5s ease;
+    }
+    
+    .mission-image:hover img {
+        transform: scale(1.05);
+    }
+    
+    .mission-text h2 {
+        font-size: 2.5rem;
+        margin-bottom: 25px;
+        color: var(--dark-color);
+    }
+    
+    .mission-text p {
+        margin-bottom: 25px;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #555;
+    }
+    
+    .values-section {
+        padding: 100px 0;
+        background: white;
+    }
+    
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+    
+    .value-card {
+        text-align: center;
+        padding: 40px 30px;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        transition: var(--transition);
+        border-top: 5px solid transparent;
+    }
+    
+    .value-card:hover {
+        transform: translateY(-10px);
+        border-top-color: var(--primary-color);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    .value-icon {
+        width: 90px;
+        height: 90px;
+        background: linear-gradient(135deg, var(--accent-color), #f72585);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        color: white;
+        font-size: 2.2rem;
+    }
+    
+    .value-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: var(--dark-color);
+    }
+    
+    .team-section {
+        padding: 100px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 50px;
+    }
+    
+    .team-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        position: relative;
+    }
+
+    .team-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .team-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .team-card:hover::before {
+        opacity: 1;
+    }
+    
+    .team-image {
+        height: 140px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .team-image img {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 50%;
+        transition: transform 0.5s ease;
+    }
+    
+    .team-card:hover .team-image img {
+        transform: scale(1.1);
+    }
+    
+    .team-info {
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .team-info h3 {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+        color: var(--dark-color);
+    }
+    
+    .team-role {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 1rem;
+    }
+    
+    .team-bio {
+        color: var(--gray-color);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .team-social {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .team-social a {
+        width: 40px;
+        height: 40px;
+        background: #f5f5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark-color);
+        transition: var(--transition);
+    }
+    
+    .team-social a:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    .team-subsection {
+        margin-bottom: 60px;
+    }
+
+    .subsection-title {
+        font-size: 1.8rem;
+        color: var(--dark-color);
+        margin-bottom: 30px;
+        text-align: center;
+        position: relative;
+    }
+
+    .subsection-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border-radius: 2px;
+    }
+    
+    .timeline-section {
+        padding: 100px 0;
+        background: white;
+    }
+    
+    .timeline {
+        position: relative;
+        max-width: 800px;
+        margin: 50px auto 0;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+        border-radius: 2px;
+    }
+    
+    .timeline-item {
+        margin-bottom: 60px;
+        position: relative;
+        width: 45%;
+    }
+    
+    .timeline-item:nth-child(odd) {
+        left: 0;
+    }
+    
+    .timeline-item:nth-child(even) {
+        left: 55%;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        top: 0;
+        border: 4px solid white;
+        box-shadow: 0 0 0 4px var(--accent-color);
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-dot {
+        right: -12px;
+    }
+    
+    .timeline-item:nth-child(even) .timeline-dot {
+        left: -12px;
+    }
+    
+    .timeline-content {
+        background: white;
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    
+    .timeline-content h3 {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+        color: var(--dark-color);
+    }
+    
+    .timeline-year {
+        display: inline-block;
+        background: var(--primary-color);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .cta-section {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        padding: 100px 0;
+        text-align: center;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .cta-content h2 {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        color: white;
+    }
+    
+    .cta-content p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 40px;
+        opacity: 0.9;
+    }
+    
+    .cta-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn-light {
+        background: white;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .btn-light:hover {
+        background: #f8f9fa;
+        color: var(--secondary-color);
+        transform: translateY(-3px);
+    }
+    
+    @media (max-width: 992px) {
+        .about-hero h1 {
+            font-size: 2.8rem;
+        }
+        
+        .mission-content {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        
+        .mission-text h2 {
+            font-size: 2.2rem;
+        }
+        
+        .timeline::before {
+            left: 30px;
+        }
+        
+        .timeline-item {
+            width: calc(100% - 60px);
+            left: 60px !important;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-dot,
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -41px;
+        }
+        
+        .cta-content h2 {
+            font-size: 2.3rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .about-hero {
+            padding: 100px 0 60px;
+        }
+
+        .about-hero h1 {
+            font-size: 2.2rem;
+        }
+
+        .stats-section {
+            padding: 40px 0;
+        }
+
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            padding: 20px 15px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+        }
+
+        .values-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .team-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .cta-content h2 {
+            font-size: 2rem;
+        }
+
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .team-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 1.8rem;
+        }
+        
+        .mission-section,
+        .values-section,
+        .team-section,
+        .timeline-section {
+            padding: 80px 0;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="about-hero">
+    <div class="container">
+        <h1 class="slide-up">Empowering Youth Beyond Addiction</h1>
+        <p class="slide-up">We believe every young person deserves the chance to build a healthy, fulfilling future.</p>
+        <a href="#history" class="btn btn-accent slide-up">Discover Our Story</a>
+    </div>
+</section>
+
+<!-- Mission & Vision Section -->
+<section class="mission-section" id="story">
+    <div class="container">
+        <div class="mission-content">
+            <div class="mission-image slide-up">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Our Learning Community">
+            </div>
+            <div class="mission-text slide-up">
+                <h2>Our Mission & Vision</h2>
+                <p>Our mission is: {{ website_settings.mission|default:"to shield and empower young people, especially women, from the dangers of drug and substance abuse by providing education, mentorship, rehabilitation, and career-building opportunities that foster long-term personal and professional growth." }}</p>
+                <p>Our vision is: {{ website_settings.vision|default:"is to build a society free from drug and substance abuse, where youth and women are empowered, productive, and morally upright citizens"}}</p>
+                <p>United by a shared vision, we remain committed to empowering young people, strengthening communities, and breaking the cycle of drug abuse. With every program, partnership, and conversation, we move closer to a future where every youth can thrive, dream, and live free from addiction.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Values Section -->
+<section class="values-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Our Core Values</h2>
+            <p>The principles that guide everything we do at Youth Shield Foundation</p>
+        </div>
+        
+        <div class="values-grid">
+            {% for value in core_values %}
+            <div class="value-card fade-in">
+                <div class="value-icon">
+                    <i class="{{ value.icon_class }}"></i>
+                </div>
+                <h3>{{ value.name }}</h3>
+                <p>{{ value.description }}</p>
+            </div>
+            {% empty %}
+            <p>Our corevalues coming soon, check later ! </p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Our Leadership</h2>
+            <p>Our Board of Directors brings together a diverse team of experienced leaders, visionaries, and experts who guide our mission and ensure we remain true to our values</p>
+        </div>
+
+        <!-- Board of Directors -->
+        {% if board_members %}
+        <div class="team-subsection">
+            <h3 class="subsection-title">Board of Directors</h3>
+            <div class="team-grid">
+                {% for member in board_members %}
+                <div class="team-card fade-in">
+                    <div class="team-image">
+                        {% if member.photo %}
+                        <img src="{{ member.photo.url }}" alt="{{ member.name }}">
+                        {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ member.name|urlencode }}&background=random&size=280" alt="{{ member.name }}">
+                        {% endif %}
+                    </div>
+                    <div class="team-info">
+                        <h3>{{ member.name }}</h3>
+                        <div class="team-role">{{ member.position }}</div>
+                        <p class="team-bio">{{ member.bio }}</p>
+                        <div class="team-social">
+                            <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" title="Email"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Executive Committee -->
+        {% if executive_committee %}
+        <div class="team-subsection">
+            <h3 class="subsection-title">Executive Committee</h3>
+            <div class="team-grid">
+                {% for member in executive_committee %}
+                <div class="team-card fade-in">
+                    <div class="team-image">
+                        {% if member.photo %}
+                        <img src="{{ member.photo.url }}" alt="{{ member.name }}">
+                        {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ member.name|urlencode }}&background=random&size=280" alt="{{ member.name }}">
+                        {% endif %}
+                    </div>
+                    <div class="team-info">
+                        <h3>{{ member.name }}</h3>
+                        <div class="team-role">{{ member.position }}</div>
+                        <p class="team-bio">{{ member.bio }}</p>
+                        <div class="team-social">
+                            <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" title="Email"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number" data-count="1000">0</div>
+                <div class="stat-label">Youths Reached</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <div class="stat-number" data-count="5">0</div>
+                <div class="stat-label">Partnerships</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="stat-number" data-count="50">0</div>
+                <div class="stat-label">Programs Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="stat-number" data-count="1">0</div>
+                <div class="stat-label">Cities Impacted</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Timeline Section -->
+<section class="timeline-section" id="history">
+    <div class="container">
+        <div class="section-title">
+            <h2>Our Journey</h2>
+            <p>Key milestones in Youth Shield Foundation growth and impact</p>
+        </div>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-year">October 2024</span>
+                    <h3>Early Days</h3>
+                    <p>Youth Shield was first started as program at the university of Eldoret with a mission to shield the youths especially students from drug abuse and exhibited during public lecture week held at the University of Eldoret from 16 - 18 October 2024.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-year">January 2025</span>
+                    <h3>Foundation Launch</h3>
+                    <p>Early in January 2025 the youth shield program evolved into a foundation, expanding its cause and mission to the occupant of Eldoret town.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-year">March 2025</span>
+                    <h3>Online Platform Launch</h3>
+                    <p>Launched our digital awareness and educational platform online, expanding access to worldwide and we able to sensitize 1,000 youths online within the first two months.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-year">June 2025</span>
+                    <h3>Industry Partnerships</h3>
+                    <p>Established partnerships with NACADA and for the same cause of drug abuse awareness and digital education.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-year">July 2025</span>
+                    <h3>Office Establishment</h3>
+                    <p>Established our first office at Eldoret town, Oloo street 64 Arcade, and continued to impact youths and women from all corners of the country.</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="timeline-year">January 2026</span>
+                    <h3>Registration in the Non Governmental Organization</h3>
+                    <p>Youth Shield Foundation was officially legally registered in the Non Governmental Organization.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Animated counter for statistics
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.stat-number');
+        const speed = 200; // The lower the faster
+        
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-count');
+                const count = +counter.innerText;
+                const increment = target / speed;
+                
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + increment);
+                    setTimeout(updateCount, 1);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            
+            // Start counting when element is in viewport
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        updateCount();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            observer.observe(counter);
+        });
+        
+        // Timeline animation
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        timelineItems.forEach((item, index) => {
+            item.style.animationDelay = `${index * 0.2}s`;
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

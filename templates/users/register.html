@@ -1,0 +1,711 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Youth Shield Foundation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon-32x32.png' %}">
+    <style>
+        :root {
+            --primary-color: #1a472a;
+            --secondary-color: #9acd32;
+            --accent-color: #ff69b4;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: var(--card-background);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, var(--primary-color), #2a593a);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .register-header .logo {
+            margin-bottom: 15px;
+        }
+
+        .register-header .logo img {
+            height: 60px;
+            width: auto;
+        }
+
+        .register-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .register-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .register-form {
+            padding: 30px 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-color);
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            color: var(--primary-color);
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: var(--card-background);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(154, 205, 50, 0.1);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--accent-color);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        .strength-weak .strength-fill {
+            width: 33%;
+            background: var(--accent-color);
+        }
+
+        .strength-medium .strength-fill {
+            width: 66%;
+            background: #ffa500;
+        }
+
+        .strength-strong .strength-fill {
+            width: 100%;
+            background: var(--secondary-color);
+        }
+
+        .password-help {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .password-help ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .password-help li {
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-help li i {
+            margin-right: 5px;
+            width: 12px;
+        }
+
+        .password-help li.valid {
+            color: var(--secondary-color);
+        }
+
+        .password-help li.invalid {
+            color: var(--accent-color);
+        }
+
+        .terms-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(26, 71, 42, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(26, 71, 42, 0.1);
+        }
+
+        .terms-group .form-check {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .terms-group .form-check input[type="checkbox"] {
+            margin-top: 3px;
+            margin-right: 10px;
+            accent-color: var(--secondary-color);
+        }
+
+        .terms-group .form-check label {
+            font-size: 14px;
+            color: var(--text-color);
+            line-height: 1.4;
+            cursor: pointer;
+        }
+
+        .terms-group .form-check label a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .terms-group .form-check label a:hover {
+            text-decoration: underline;
+        }
+
+        .invalid-feedback {
+            color: var(--accent-color);
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .invalid-feedback i {
+            margin-right: 5px;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary-color), #2a593a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .register-btn:hover {
+            background: linear-gradient(135deg, #153420, var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(26, 71, 42, 0.2);
+        }
+
+        .register-btn:active {
+            transform: translateY(0);
+        }
+
+        .register-btn.loading {
+            color: transparent;
+        }
+
+        .register-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .register-footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--background-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .register-footer p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .login-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            animation: slideDown 0.3s ease;
+        }
+
+        .alert-success {
+            background-color: rgba(154, 205, 50, 0.1);
+            border: 1px solid var(--secondary-color);
+            color: var(--primary-color);
+        }
+
+        .alert-error {
+            background-color: rgba(255, 105, 180, 0.1);
+            border: 1px solid var(--accent-color);
+            color: #cc3366;
+        }
+
+        .alert i {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .register-container {
+                margin: 10px;
+            }
+
+            .register-header {
+                padding: 20px;
+            }
+
+            .register-form {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                margin: 10px;
+            }
+
+            .register-header {
+                padding: 20px;
+            }
+
+            .register-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <div class="logo">
+                {% if website_settings.logo %}
+                    <img src="{{ website_settings.logo.url }}" alt="{{ website_settings.name|default:'Youth Shield Foundation' }}">
+                {% else %}
+                    <i class="fas fa-shield-alt fa-3x"></i>
+                {% endif %}
+            </div>
+            <h1>Join Our Community</h1>
+            <p>Create your account to get started</p>
+        </div>
+
+        <div class="register-form">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                        <div>{{ message }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'users:register' %}" id="registerForm">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">
+                        <i class="fas fa-user"></i>{{ form.username.label }}
+                    </label>
+                    <input type="text"
+                           name="{{ form.username.name }}"
+                           id="{{ form.username.id_for_label }}"
+                           class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                           placeholder="Choose a username"
+                           value="{{ form.username.value|default:'' }}"
+                           required>
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <i class="fas fa-exclamation-circle"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">
+                        <i class="fas fa-envelope"></i>{{ form.email.label }}
+                    </label>
+                    <input type="email"
+                           name="{{ form.email.name }}"
+                           id="{{ form.email.id_for_label }}"
+                           class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                           placeholder="you@example.com"
+                           value="{{ form.email.value|default:'' }}"
+                           required>
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <i class="fas fa-exclamation-circle"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="{{ form.first_name.id_for_label }}">
+                            <i class="fas fa-user-tag"></i>{{ form.first_name.label }}
+                        </label>
+                        <input type="text"
+                               name="{{ form.first_name.name }}"
+                               id="{{ form.first_name.id_for_label }}"
+                               class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                               placeholder="First name"
+                               value="{{ form.first_name.value|default:'' }}">
+                        {% if form.first_name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.first_name.errors %}
+                                    <i class="fas fa-exclamation-circle"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.last_name.id_for_label }}">
+                            <i class="fas fa-user-tag"></i>{{ form.last_name.label }}
+                        </label>
+                        <input type="text"
+                               name="{{ form.last_name.name }}"
+                               id="{{ form.last_name.id_for_label }}"
+                               class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                               placeholder="Last name"
+                               value="{{ form.last_name.value|default:'' }}">
+                        {% if form.last_name.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.last_name.errors %}
+                                    <i class="fas fa-exclamation-circle"></i>{{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.phone_number.id_for_label }}">
+                        <i class="fas fa-phone"></i>{{ form.phone_number.label }}
+                    </label>
+                    <input type="tel"
+                           name="{{ form.phone_number.name }}"
+                           id="{{ form.phone_number.id_for_label }}"
+                           class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                           placeholder="+1234567890"
+                           value="{{ form.phone_number.value|default:'' }}">
+                    {% if form.phone_number.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.phone_number.errors %}
+                                <i class="fas fa-exclamation-circle"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password1.id_for_label }}">
+                        <i class="fas fa-lock"></i>{{ form.password1.label }}
+                    </label>
+                    <div class="password-container">
+                        <input type="password"
+                               name="{{ form.password1.name }}"
+                               id="{{ form.password1.id_for_label }}"
+                               class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                               placeholder="Create a password"
+                               required
+                               oninput="checkPasswordStrength(this.value)">
+                        <button type="button" class="password-toggle" onclick="togglePassword('{{ form.password1.id_for_label }}')">
+                            <i class="fas fa-eye" id="{{ form.password1.id_for_label }}-icon"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill"></div>
+                        </div>
+                    </div>
+                    {% if form.password1.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.password1.errors %}
+                                <i class="fas fa-exclamation-circle"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="password-help">
+                            <ul>
+                                <li id="length-check" class="invalid"><i class="fas fa-circle"></i> At least 8 characters</li>
+                                <li id="uppercase-check" class="invalid"><i class="fas fa-circle"></i> One uppercase letter</li>
+                                <li id="lowercase-check" class="invalid"><i class="fas fa-circle"></i> One lowercase letter</li>
+                                <li id="number-check" class="invalid"><i class="fas fa-circle"></i> One number</li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.password2.id_for_label }}">
+                        <i class="fas fa-lock"></i>{{ form.password2.label }}
+                    </label>
+                    <div class="password-container">
+                        <input type="password"
+                               name="{{ form.password2.name }}"
+                               id="{{ form.password2.id_for_label }}"
+                               class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                               placeholder="Confirm your password"
+                               required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('{{ form.password2.id_for_label }}')">
+                            <i class="fas fa-eye" id="{{ form.password2.id_for_label }}-icon"></i>
+                        </button>
+                    </div>
+                    {% if form.password2.errors %}
+                        <div class="invalid-feedback">
+                            {% for error in form.password2.errors %}
+                                <i class="fas fa-exclamation-circle"></i>{{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="terms-group">
+                    <div class="form-check">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">
+                            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="register-btn" id="registerBtn">
+                    <i class="fas fa-user-plus"></i>Create Account
+                </button>
+            </form>
+        </div>
+
+        <div class="register-footer">
+            <p>Already have an account?</p>
+            <a href="{% url 'users:login' %}" class="login-link">Sign in here</a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const input = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId + '-icon');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function checkPasswordStrength(password) {
+            const strengthIndicator = document.getElementById('password-strength');
+            const checks = ['length', 'uppercase', 'lowercase', 'number'];
+
+            checks.forEach(check => {
+                const element = document.getElementById(check + '-check');
+                element.classList.remove('valid', 'invalid');
+                element.classList.add('invalid');
+                element.querySelector('i').className = 'fas fa-circle';
+            });
+
+            let score = 0;
+
+            if (password.length >= 8) {
+                score++;
+                updateCheck('length', true);
+            }
+
+            if (/[A-Z]/.test(password)) {
+                score++;
+                updateCheck('uppercase', true);
+            }
+
+            if (/[a-z]/.test(password)) {
+                score++;
+                updateCheck('lowercase', true);
+            }
+
+            if (/\d/.test(password)) {
+                score++;
+                updateCheck('number', true);
+            }
+
+            strengthIndicator.className = 'password-strength';
+            if (score > 0) {
+                if (score <= 2) {
+                    strengthIndicator.classList.add('strength-weak');
+                } else if (score === 3) {
+                    strengthIndicator.classList.add('strength-medium');
+                } else {
+                    strengthIndicator.classList.add('strength-strong');
+                }
+            }
+        }
+
+        function updateCheck(checkType, isValid) {
+            const element = document.getElementById(checkType + '-check');
+            element.classList.remove('valid', 'invalid');
+            element.classList.add(isValid ? 'valid' : 'invalid');
+            element.querySelector('i').className = isValid ? 'fas fa-check-circle' : 'fas fa-circle';
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.classList.add('loading');
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner"></i>Creating Account...';
+        });
+
+        // Auto-hide alerts
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelectorAll('.alert').forEach(alert => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

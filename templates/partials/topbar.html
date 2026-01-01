@@ -1,0 +1,102 @@
+<div class="topbar">
+    <style>
+        .topbar {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        
+        .topbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .topbar-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .topbar-item i {
+            color: var(--accent-color);
+        }
+        
+        .topbar-link {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .topbar-link:hover {
+            color: var(--accent-color);
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            min-width: 180px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .user-menu:hover .user-dropdown {
+            display: block;
+        }
+        
+        .user-dropdown a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--dark-color);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-dropdown a:hover {
+            background-color: #f5f5f5;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .topbar {
+                display: none;
+            }
+        }
+    </style>
+    
+    <div class="container">
+        <div class="topbar-content">
+            <div class="topbar-left">
+                <div class="topbar-item">
+                    <i class="fas fa-phone-alt"></i>
+                    <span>{{ website_settings.contact_phone|default:"+1 (234) 567-8900" }}</span>
+                </div>
+                <div class="topbar-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ website_settings.contact_email|default:"info@skillbridge.com" }}</span>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</div>

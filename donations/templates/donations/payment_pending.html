@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment_pending - Youthshieldfoundation{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Minimal color palette */
+:root {
+    --primary: #4f46e5;
+    --primary-light: #818cf8;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --success: #10b981;
+}
+
+/* Hero section - minimal */
+.pending-hero {
+    background: var(--gray-50);
+    padding: 3rem 0;
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.pending-hero h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.pending-hero p {
+    color: var(--gray-600);
+    font-size: 1rem;
+}
+
+/* Main card - clean and simple */
+.pending-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid var(--gray-100);
+    overflow: hidden;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Minimal loading spinner */
+.minimal-spinner {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 2rem;
+    position: relative;
+}
+
+.minimal-spinner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid var(--gray-100);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Status indicator */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--gray-50);
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Info cards - minimal */
+.info-card {
+    background: var(--gray-50);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    border-left: 3px solid var(--primary);
+}
+
+.info-card h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.info-card p {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Transaction details - clean list */
+.transaction-details {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.transaction-details li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.transaction-details li:last-child {
+    border-bottom: none;
+}
+
+.transaction-details .label {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.transaction-details .value {
+    color: var(--gray-800);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Minimal progress indicator */
+.progress-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.progress-text span {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.progress-bar-minimal {
+    height: 4px;
+    background: var(--gray-100);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    width: 65%;
+    animation: progress 2s ease-in-out infinite alternate;
+}
+
+@keyframes progress {
+    from { width: 65%; }
+    to { width: 70%; }
+}
+
+/* Buttons - minimal style */
+.btn-minimal {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    border: 1px solid var(--gray-200);
+    background: white;
+    color: var(--gray-700);
+}
+
+.btn-minimal:hover {
+    background: var(--gray-50);
+    transform: translateY(-1px);
+}
+
+.btn-minimal.primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.btn-minimal.primary:hover {
+    background: var(--primary-light);
+}
+
+/* Instructions list */
+.instructions {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0;
+}
+
+.instructions li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.instructions li i {
+    color: var(--primary);
+    margin-top: 0.125rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .pending-hero {
+        padding: 2rem 1rem;
+    }
+    
+    .pending-hero h1 {
+        font-size: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-minimal {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .pending-card {
+        margin: 0 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pending-hero">
+    <div class="container">
+        <h1>Payment Processing</h1>
+        <p>Your donation is being processed</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="pending-card">
+                <div class="card-body text-center">
+                    <!-- Status indicator -->
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span style="color: var(--gray-600); font-size: 0.875rem;">Processing</span>
+                    </div>
+
+                    <!-- Minimal spinner -->
+                    <div class="minimal-spinner"></div>
+
+                    <!-- Main title -->
+                    <h4 style="color: var(--gray-800); margin-bottom: 1rem;">Processing Payment</h4>
+                    <p style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 2rem;">
+                        Please wait while we confirm your payment
+                    </p>
+
+                    {% if donation.payment_method == 'mpesa' %}
+                    <!-- M-Pesa instructions -->
+                    <div class="info-card">
+                        <h6>M-Pesa Payment</h6>
+                        <p>Check your phone and enter your PIN to complete payment</p>
+                    </div>
+
+                    <!-- Transaction details -->
+                    <ul class="transaction-details">
+                        <li>
+                            <span class="label">Transaction ID</span>
+                            <span class="value">{{ donation.transaction_id }}</span>
+                        </li>
+                        <li>
+                            <span class="label">Amount</span>
+                            <span class="value">KES {{ donation.amount }}</span>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                    <!-- Progress indicator -->
+                    <div style="margin: 2rem 0;">
+                        <div class="progress-text">
+                            <span>Processing</span>
+                            <span>65%</span>
+                        </div>
+                        <div class="progress-bar-minimal">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <ul class="instructions">
+                        <li>
+                            <i class="fas fa-sync-alt fa-xs"></i>
+                            <span>This page will update automatically</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-exclamation-circle fa-xs"></i>
+                            <span>Do not close or refresh this page</span>
+                        </li>
+                    </ul>
+
+                    <!-- Action buttons -->
+                    <div class="button-group d-flex gap-3 justify-content-center mt-4">
+                        <a href="{% url 'donations:donate' %}" class="btn-minimal">
+                            <i class="fas fa-arrow-left me-2 fa-sm"></i>
+                            Back
+                        </a>
+                        <a href="{% url 'core:home' %}" class="btn-minimal primary">
+                            <i class="fas fa-home me-2 fa-sm"></i>
+                            Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Minimal auto-check
+setTimeout(function() {
+    window.location.href = "{% url 'donations:check_payment' donation.id %}";
+}, 5000);
+</script>
+{% endblock %}

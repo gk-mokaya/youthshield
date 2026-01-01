@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}Testimonials - Youthshieldfoundation{% endblock %}
+
+{% block content %}
+<style>
+    .testimonials-hero {
+        background: linear-gradient(rgba(247, 37, 133, 0.9), rgba(216, 17, 89, 0.9)), url('https://images.unsplash.com/photo-1521791055366-0d553872125f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        text-align: center;
+        padding: 100px 0 60px;
+    }
+    
+    .testimonials-hero h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+    
+    .testimonials-hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 30px;
+        opacity: 0.9;
+    }
+    
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+    
+    .testimonial-card {
+        position: relative;
+        padding-top: 60px;
+    }
+    
+    .testimonial-avatar {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 5px solid white;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .testimonial-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .testimonial-content {
+        text-align: center;
+        padding-top: 50px;
+    }
+    
+    .testimonial-text {
+        font-style: italic;
+        margin-bottom: 20px;
+        position: relative;
+    }
+    
+    .testimonial-text::before,
+    .testimonial-text::after {
+        content: '"';
+        font-size: 2rem;
+        color: var(--accent-color);
+        opacity: 0.3;
+    }
+    
+    .testimonial-author h4 {
+        margin-bottom: 5px;
+        color: var(--dark-color);
+    }
+    
+    .testimonial-role {
+        color: var(--gray-color);
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .testimonial-rating {
+        color: #ffc107;
+        font-size: 0.9rem;
+    }
+    
+    .add-testimonial-section {
+        background-color: var(--light-color);
+        border-radius: var(--border-radius);
+        padding: 40px;
+        margin-top: 60px;
+    }
+    
+    .testimonial-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        font-family: 'Poppins', sans-serif;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+    
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+    
+    .rating-input {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .rating-star {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    
+    .rating-star.active {
+        color: #ffc107;
+    }
+    
+    @media (max-width: 768px) {
+        .testimonials-hero {
+            padding: 80px 0 40px;
+        }
+        
+        .testimonials-hero h1 {
+            font-size: 2.2rem;
+        }
+        
+        .testimonials-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .add-testimonial-section {
+            padding: 30px 20px;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="testimonials-hero">
+    <div class="container">
+        <h1>Success Stories</h1>
+        <p>Read testimonials about how Youth Shield Foundation has transformed youth's lifes and helped them achieve their goals.</p>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <p>Real stories from real people who transformed their lifes through our organization, Supporting Youth Shield is an investment in Kenya's future</p>
+        </div>
+
+        
+         <!-- Add more testimonials here dynamically -->
+        <div class="testimonials-grid">
+            {% if testimonials %}
+                {% for testimonial in testimonials %}
+                <div class="testimonial-card card fade-in">
+                    <div class="testimonial-avatar">
+                        {% if testimonial.user.profile_picture %}
+                        <img src="{{ testimonial.user.profile_picture.url }}" alt="{{ testimonial.user.get_full_name }}">
+                        {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ testimonial.user.get_full_name|urlencode }}&background=random" alt="{{ testimonial.user.get_full_name }}">
+                        {% endif %}
+                    </div>
+                    <div class="testimonial-content">
+                        <div class="testimonial-text">
+                            {{ testimonial.content }}
+                        </div>
+                        <div class="testimonial-author">
+                            <h4>{{ testimonial.user.get_full_name|default:testimonial.user.username }}</h4>
+                            <div class="testimonial-role">{{ testimonial.position|default:"Beneficiary" }}</div>
+                            <div class="testimonial-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= testimonial.rating %}
+                                    <i class="fas fa-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center">No testimonials available at the moment. Be the first to share your experience!</p>
+            {% endif %}
+        </div>
+        
+        <!-- Add Testimonial Form -->
+        {% if user.is_authenticated %}
+        <div class="add-testimonial-section card">
+            <div class="section-title">
+                <h2>Share Your Experience</h2>
+                <p>Help others discover the value of SkillBridge by sharing your story</p>
+            </div>
+            
+            <form class="testimonial-form" method="POST" action="{% url 'testimonials:add_testimonial' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Your Testimonial</label>
+                    <textarea name="content" class="form-control" placeholder="Share your learning experience and career transformation..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Your Current Position (Optional)</label>
+                    <input type="text" name="position" class="form-control" placeholder="e.g., Software Developer at Google">
+                </div>
+                
+                <div class="form-group">
+                    <label>Rating</label>
+                    <div class="rating-input">
+                        {% for i in "12345" %}
+                        <span class="rating-star" data-rating="{{ forloop.counter }}">
+                            <i class="far fa-star"></i>
+                        </span>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="rating" id="rating-value" value="5" required>
+                </div>
+                
+                <div class="text-center">
+                    <button type="submit" class="btn btn-accent">
+                        <i class="fas fa-paper-plane"></i> Submit Testimonial
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="text-center mt-4">
+            <a href="{% url 'users:login' %}?next={% url 'core:testimonials' %}" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login to Add Your Testimonial
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+    // Star rating system
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.rating-star');
+        const ratingInput = document.getElementById('rating-value');
+        
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = this.getAttribute('data-rating');
+                ratingInput.value = rating;
+                
+                stars.forEach(s => {
+                    const sRating = s.getAttribute('data-rating');
+                    const icon = s.querySelector('i');
+                    
+                    if (sRating <= rating) {
+                        icon.className = 'fas fa-star';
+                        s.classList.add('active');
+                    } else {
+                        icon.className = 'far fa-star';
+                        s.classList.remove('active');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

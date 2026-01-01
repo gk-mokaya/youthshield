@@ -1,0 +1,212 @@
+{% extends 'staff_dashboard/base.html' %}
+
+{% block title %}Website Settings - Staff Portal{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Website Settings</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Website Settings</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="submit" form="settingsForm" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Save Settings
+        </button>
+    </div>
+</div>
+
+<form method="POST" enctype="multipart/form-data" id="settingsForm">
+    {% csrf_token %}
+    
+    <div class="row">
+        <!-- Basic Settings -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Organization Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ settings.name }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tagline" class="form-label">Tagline</label>
+                        <input type="text" class="form-control" id="tagline" name="tagline" 
+                               value="{{ settings.tagline|default:'' }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="3">{{ settings.description|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="mission" class="form-label">Mission *</label>
+                            <textarea class="form-control" id="mission" name="mission" 
+                                      rows="4" required>{{ settings.mission }}</textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="vision" class="form-label">Vision *</label>
+                            <textarea class="form-control" id="vision" name="vision" 
+                                      rows="4" required>{{ settings.vision }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_email" class="form-label">Contact Email *</label>
+                            <input type="email" class="form-control" id="contact_email" name="contact_email" 
+                                   value="{{ settings.contact_email }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="contact_phone" class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" id="contact_phone" name="contact_phone" 
+                                   value="{{ settings.contact_phone }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" 
+                                  rows="2">{{ settings.address }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Media & Social -->
+        <div class="col-md-4">
+            <!-- Logo Upload -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Logo</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if settings.logo %}
+                    <img src="{{ settings.logo.url }}" alt="Current Logo" 
+                         class="img-fluid mb-3" style="max-height: 150px;">
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="logo" class="form-label">Upload New Logo</label>
+                        <input type="file" class="form-control" id="logo" name="logo" 
+                               accept="image/*">
+                    </div>
+                    <small class="text-muted">Recommended: 300x100px, PNG or JPG</small>
+                </div>
+            </div>
+            
+            <!-- Social Media -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Social Media Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="facebook_url" class="form-label">
+                            <i class="fab fa-facebook text-primary me-2"></i>Facebook
+                        </label>
+                        <input type="url" class="form-control" id="facebook_url" name="facebook_url" 
+                               value="{{ settings.facebook_url|default:'' }}" 
+                               placeholder="https://facebook.com/yourpage">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="twitter_url" class="form-label">
+                            <i class="fab fa-twitter text-info me-2"></i>Twitter
+                        </label>
+                        <input type="url" class="form-control" id="twitter_url" name="twitter_url" 
+                               value="{{ settings.twitter_url|default:'' }}" 
+                               placeholder="https://twitter.com/yourhandle">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="instagram_url" class="form-label">
+                            <i class="fab fa-instagram text-danger me-2"></i>Instagram
+                        </label>
+                        <input type="url" class="form-control" id="instagram_url" name="instagram_url" 
+                               value="{{ settings.instagram_url|default:'' }}" 
+                               placeholder="https://instagram.com/yourprofile">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="linkedin_url" class="form-label">
+                            <i class="fab fa-linkedin text-primary me-2"></i>LinkedIn
+                        </label>
+                        <input type="url" class="form-control" id="linkedin_url" name="linkedin_url" 
+                               value="{{ settings.linkedin_url|default:'' }}" 
+                               placeholder="https://linkedin.com/company/yourcompany">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tiktok_url" class="form-label">
+                            <i class="fab fa-tiktok me-2"></i>TikTok
+                        </label>
+                        <input type="url" class="form-control" id="tiktok_url" name="tiktok_url" 
+                               value="{{ settings.tiktok_url|default:'' }}" 
+                               placeholder="https://tiktok.com/@yourprofile">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="whatsapp_channel_url" class="form-label">
+                            <i class="fab fa-whatsapp text-success me-2"></i>WhatsApp Channel
+                        </label>
+                        <input type="url" class="form-control" id="whatsapp_channel_url" name="whatsapp_channel_url" 
+                               value="{{ settings.whatsapp_channel_url|default:'' }}" 
+                               placeholder="https://whatsapp.com/channel/yourchannel">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Image preview for logo upload
+    $('#logo').change(function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('.card-body img').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Form validation
+    $('#settingsForm').submit(function(e) {
+        const email = $('#contact_email').val();
+        if (email && !validateEmail(email)) {
+            e.preventDefault();
+            alert('Please enter a valid email address');
+            $('#contact_email').focus();
+            return false;
+        }
+    });
+    
+    function validateEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,252 @@
+<nav class="navbar">
+    <style>
+        .navbar {
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            color: var(--accent-color);
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .nav-link {
+            color: var(--dark-color);
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 8px 0;
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-color);
+            bottom: 0;
+            left: 0;
+            transition: var(--transition);
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            color: var(--dark-color);
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .logo {
+                font-size: 1.4rem;
+                gap: 4px;
+                color:black;
+            }
+
+            .logo span {
+                font-size: 1.0rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 190px;
+                font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+            }
+
+            .logo img {
+                height: 50px;
+            }
+
+            .navbar {
+                padding-left: 3px;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 66px;
+                left: 0;
+                width: 100%;
+                background-color: white;
+                flex-direction: column;
+                padding: 15px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                gap: 0;
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-link {
+                width: 100%;
+                padding: 12px 0;
+                border-bottom: 1px solid #eee;
+                font-size: 1rem;
+            }
+
+            .nav-link:last-child {
+                border-bottom: none;
+            }
+
+            .topbar-right {
+                gap: 5px;
+            }
+
+            .topbar-link {
+                font-size: 14px;
+                margin-left: 3px;
+            }
+        }
+
+    
+        .topbar-right {
+            display: flex;
+            align-items: center;
+           
+        }
+        
+        .topbar-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .topbar-item i {
+            color: var(--accent-color);
+        }
+        
+        .topbar-link {
+            color: black;
+            text-decoration: none;
+        }
+        
+        .topbar-link:hover {
+            color: var(--accent-color);
+        }
+        
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            box-shadow: var(--box-shadow);
+            border-radius: var(--border-radius);
+            min-width: 180px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .user-menu:hover .user-dropdown {
+            display: block;
+        }
+        
+        .user-dropdown a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--dark-color);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-dropdown a:hover {
+            background-color: #f5f5f5;
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .topbar {
+                display: none;
+            }
+        }
+    </style>
+    
+    <div class="container nav-container">
+        <a href="{% url 'core:home' %}" class="logo">
+            {% if website_settings.logo %}
+                <img src="{{ website_settings.logo.url }}" alt="{{ website_settings.name|default:'Youth Shield Foundation' }}" height="40">
+            {% else %}
+                <i class="fas fa-graduation-cap"></i>
+            {% endif %}
+            <span>{{ website_settings.name|default:"Youth Shield Foundation" }}</span>
+        </a>
+        
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-links">
+            <a href="{% url 'core:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
+            <a href="{% url 'core:programs' %}" class="nav-link {% if request.resolver_match.url_name == 'programs' %}active{% endif %}">Programs</a>
+            <a href="{% url 'core:about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+            <a href="{% url 'core:testimonials' %}" class="nav-link {% if request.resolver_match.url_name == 'testimonials' %}active{% endif %}">Testimonials</a>
+            <a href="{% url 'core:contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
+        </div>
+
+         <div class="topbar-right">
+                {% if user.is_authenticated %}
+                <div class="user-menu">
+                    <div href="{% url 'users:profile' %}" class="topbar-link">
+                        <i class="fas fa-user"></i> {{ user.username }}
+                    </div>
+                    <div class="user-dropdown">
+                        {% if user.is_staff %}
+                        <a href="{% url 'staff_dashboard:dashboard' %}"><i class="fas fa-tachometer-alt"></i>Staff Dashboard</a>
+                        {% endif %}
+                        <a href="{% url 'users:profile' %}"><i class="fas fa-user-circle"></i> Profile</a>
+                        <a href="{% url 'donations:history' %}"> <i class="fa-solid fa-hand-holding-dollar"></i>My Donations</a>
+                        <a href="{% url 'users:profile' %}"><i class="fas fa-cog"></i>Settings</a>
+                        <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'users:login' %}" class="topbar-link">Login</a>
+                <a href="{% url 'users:register' %}" class="topbar-link">Register</a>
+                {% endif %}
+            </div>
+    </div>
+</nav>

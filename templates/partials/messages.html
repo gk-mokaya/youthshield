@@ -1,0 +1,142 @@
+<div class="messages-container">
+    <style>
+        .messages-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .message {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .message.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .message.success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .message.error {
+            border-left: 4px solid #dc3545;
+        }
+        
+        .message.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .message.info {
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .message-icon {
+            font-size: 1.5rem;
+        }
+        
+        .message.success .message-icon {
+            color: #28a745;
+        }
+        
+        .message.error .message-icon {
+            color: #dc3545;
+        }
+        
+        .message.warning .message-icon {
+            color: #ffc107;
+        }
+        
+        .message.info .message-icon {
+            color: #17a2b8;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--gray-color);
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        @media (max-width: 576px) {
+            .messages-container {
+                top: 80px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+    </style>
+    
+    {% if messages %}
+        {% for message in messages %}
+        <div class="message {{ message.tags }} {% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" id="message-{{ forloop.counter }}">
+            <div class="message-icon">
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+                {% elif message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle"></i>
+                {% else %}
+                <i class="fas fa-info-circle"></i>
+                {% endif %}
+            </div>
+            <div class="message-content">
+                {{ message }}
+            </div>
+            <button class="message-close" onclick="closeMessage('message-{{ forloop.counter }}')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<script>
+    // Show messages with animation
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.message');
+        messages.forEach((message, index) => {
+            setTimeout(() => {
+                message.classList.add('show');
+            }, 100 * index);
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                if (message.classList.contains('show')) {
+                    closeMessage(message.id);
+                }
+            }, 5000);
+        });
+    });
+    
+    function closeMessage(messageId) {
+        const message = document.getElementById(messageId);
+        if (message) {
+            message.classList.remove('show');
+            setTimeout(() => {
+                message.remove();
+            }, 300);
+        }
+    }
+</script>

@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+{% block title %}Payment_failed - Youthshieldfoundation{% endblock %}
+{% block extra_css %}
+<style>
+/* Minimal color palette */
+:root {
+    --error: #ef4444;
+    --error-light: #fca5a5;
+    --error-bg: #fef2f2;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+}
+
+/* Clean header */
+.failed-header {
+    background: var(--gray-50);
+    padding: 3rem 0 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.failed-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.failed-header p {
+    color: var(--gray-600);
+    font-size: 1rem;
+}
+
+/* Main card */
+.failed-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid var(--gray-100);
+    overflow: hidden;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Error icon */
+.error-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--error-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--error);
+    font-size: 2rem;
+    margin: 0 auto 1.5rem;
+    border: 2px solid var(--error-light);
+}
+
+/* Error message - subtle */
+.error-alert {
+    background: var(--error-bg);
+    padding: 1.25rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    border: 1px solid var(--error-light);
+    text-align: left;
+}
+
+.error-alert p {
+    color: var(--gray-800);
+    font-weight: 500;
+    margin: 0;
+}
+
+.error-alert .amount {
+    color: var(--error);
+    font-weight: 600;
+}
+
+/* Transaction details */
+.transaction-details {
+    background: var(--gray-50);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    border: 1px solid var(--gray-200);
+}
+
+.transaction-details h6 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.detail-value {
+    color: var(--gray-800);
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-align: right;
+}
+
+.status-badge {
+    background: var(--error);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Help section - minimal */
+.help-section {
+    margin: 1.5rem 0;
+}
+
+.help-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.help-title i {
+    color: var(--error);
+}
+
+.help-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.help-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    color: var(--gray-600);
+    font-size: 0.875rem;
+}
+
+.help-item i {
+    color: var(--error);
+    font-size: 0.75rem;
+    margin-top: 0.125rem;
+}
+
+/* Info message */
+.info-message {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: 8px;
+}
+
+.info-message i {
+    color: var(--error);
+}
+
+/* Buttons */
+.btn-minimal {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    border: 1px solid var(--gray-200);
+    background: white;
+    color: var(--gray-700);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-minimal:hover {
+    background: var(--gray-50);
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: var(--gray-700);
+}
+
+.btn-minimal.primary {
+    background: var(--error);
+    color: white;
+    border: none;
+}
+
+.btn-minimal.primary:hover {
+    background: var(--error-light);
+    color: white;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+    .failed-header {
+        padding: 2rem 1rem 1.5rem;
+    }
+    
+    .failed-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .btn-minimal {
+        width: 100%;
+    }
+    
+    .detail-item {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-start;
+    }
+    
+    .detail-value {
+        text-align: left;
+    }
+}
+
+@media (max-width: 768px) {
+    .failed-card {
+        margin: 0 1rem;
+    }
+}
+
+/* Error icon animation */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+.error-icon {
+    animation: shake 0.5s ease-in-out;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="failed-header">
+    <div class="container">
+        <h1>Payment Failed</h1>
+        <p>Unable to process your donation</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="failed-card">
+                <div class="card-body text-center">
+                    <!-- Error icon -->
+                    <div class="error-icon">
+                        <i class="fas fa-times"></i>
+                    </div>
+
+                    <!-- Main message -->
+                    <h4 style="color: var(--gray-800); margin-bottom: 0.5rem;">
+                        Payment Unsuccessful
+                    </h4>
+                    <p style="color: var(--gray-600); font-size: 0.875rem; margin-bottom: 1.5rem;">
+                        We were unable to process your payment at this time
+                    </p>
+
+                    <!-- Error alert -->
+                    <div class="error-alert">
+                        <p>
+                            Your donation of <span class="amount">KES {{ donation.amount }}</span> could not be processed.
+                        </p>
+                    </div>
+
+                    <!-- Transaction details -->
+                    <div class="transaction-details">
+                        <h6>Transaction Details</h6>
+                        <ul class="detail-list">
+                            <li class="detail-item">
+                                <span class="detail-label">Transaction ID</span>
+                                <span class="detail-value">{{ donation.transaction_id|default:"N/A" }}</span>
+                            </li>
+                            <li class="detail-item">
+                                <span class="detail-label">Amount</span>
+                                <span class="detail-value">KES {{ donation.amount }}</span>
+                            </li>
+                            <li class="detail-item">
+                                <span class="detail-label">Payment Method</span>
+                                <span class="detail-value">{{ donation.payment_method|upper }}</span>
+                            </li>
+                            <li class="detail-item">
+                                <span class="detail-label">Date</span>
+                                <span class="detail-value">{{ donation.created_at|date:"M j, Y" }}</span>
+                            </li>
+                            <li class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value">
+                                    <span class="status-badge">Failed</span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Help section -->
+                    <div class="help-section">
+                        <div class="help-title">
+                            <i class="fas fa-question-circle"></i>
+                            <span>What can you do?</span>
+                        </div>
+                        <ul class="help-list">
+                            <li class="help-item">
+                                <i class="fas fa-check"></i>
+                                <span>Try again with the same payment method</span>
+                            </li>
+                            <li class="help-item">
+                                <i class="fas fa-check"></i>
+                                <span>Use a different payment method</span>
+                            </li>
+                            <li class="help-item">
+                                <i class="fas fa-check"></i>
+                                <span>Check your account balance</span>
+                            </li>
+                            <li class="help-item">
+                                <i class="fas fa-check"></i>
+                                <span>Contact your bank if needed</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Info message -->
+                    <div class="info-message">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Please try again or use a different payment method</span>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="button-group d-flex gap-3 justify-content-center mt-4">
+                        <a href="{% url 'donations:donate' %}" class="btn-minimal primary">
+                            <i class="fas fa-redo fa-sm"></i>
+                            Try Again
+                        </a>
+                        <a href="{% url 'core:home' %}" class="btn-minimal">
+                            <i class="fas fa-home fa-sm"></i>
+                            Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

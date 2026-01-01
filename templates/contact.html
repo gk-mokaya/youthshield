@@ -1,0 +1,489 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - Youthshieldfoundation{% endblock %}
+
+{% block content %}
+<style>
+    .contact-hero {
+        background: linear-gradient(rgba(76, 201, 240, 0.9), rgba(4, 150, 255, 0.9)), url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        text-align: center;
+        padding: 100px 0 60px;
+    }
+    
+    .contact-hero h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+    
+    .contact-hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 30px;
+        opacity: 0.9;
+    }
+    
+    .contact-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        margin-top: 50px;
+    }
+    
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .contact-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .contact-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .contact-details h3 {
+        margin-bottom: 10px;
+        font-size: 1.3rem;
+    }
+    
+    .contact-form {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 40px;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        font-family: 'Poppins', sans-serif;
+        transition: var(--transition);
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+    
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+    
+    .map-container {
+        margin-top: 80px;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .map-placeholder {
+        background: linear-gradient(135deg, #f5f5f5, #e9ecef);
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-color);
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .map-placeholder i {
+        font-size: 4rem;
+        opacity: 0.5;
+    }
+    
+    @media (max-width: 992px) {
+        .contact-container {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+        
+        .contact-hero {
+            padding: 80px 0 40px;
+        }
+        
+        .contact-hero h1 {
+            font-size: 2.5rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .contact-form {
+            padding: 30px 20px;
+        }
+        
+        .contact-hero h1 {
+            font-size: 2.2rem;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="contact-hero">
+    <div class="container">
+        <h1>Get in Touch</h1>
+        <p>Have questions about our programs or need career advice? Our team is here to help you every step of the way.</p>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section">
+    <div class="container">
+        <div class="contact-container">
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Visit Our Offices</h3>
+                        <p>Eldoret town, Oloo Street,</p>
+                        <p>64 Arcade Plaza, 2nd Floor </p>
+                        <p>{{ website_settings.address|default:"P.O Box 1125 - 30100, Eldoret" }}</p>
+                    </div>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Call Us</h3>
+                        <p>Support Contact: {{ website_settings.contact_phone|default:"+254 791 035 846" }}</p> <p>Mon - Fri, 9:00 AM - 6:00 PM PST</p> <br>
+                        <p>Emergency Contact{{ website_settings.emergency_phone|default:"+254 797 252 133" }}</p>
+                        <p>24/7</p>
+                    </div>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Email Us</h3>
+                        <p>{{ website_settings.contact_email|default:"info@youthshieldfoundation.org" }} <br> {{ website_settings.support_email|default:"support@youthshieldfoundation.org" }}</p>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="contact-form card">
+                <h2>Send us a Message</h2>
+                <p class="mb-4">Fill out the form below and we'll get back to you within 24 hours.</p>
+                
+                <form method="POST" action="{% url 'core:contact' %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name *</label>
+                            <input type="text" id="name" name="name" class="form-control" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject *</label>
+                        <input type="text" id="subject" name="subject" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message *</label>
+                        <textarea id="message" name="message" class="form-control" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Map Section -->
+        <div class="map-container">
+            <div class="map-placeholder">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.6563929421673!2d35.2736288!3d0.5162055999999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x178101a458b3ecdb%3A0x90c3e37d32e30254!2s64%20Arcade%2C%20Oloo%20St%2C%20Eldoret!5e0!3m2!1sen!2ske!4v1765056372960!5m2!1sen!2ske" width="1100" height="350" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>        </div>
+    </div>
+</section>
+
+<!-- Live Chat Widget -->
+<div id="live-chat-widget">
+    <style>
+        #live-chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        
+        .chat-toggle {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-color), #d81159);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(247, 37, 133, 0.3);
+            transition: var(--transition);
+        }
+        
+        .chat-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .chat-box {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 350px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: none;
+            overflow: hidden;
+        }
+        
+        .chat-box.active {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .chat-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        .chat-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-message.bot {
+            align-items: flex-start;
+        }
+        
+        .chat-message.user {
+            align-items: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .bot .message-bubble {
+            background: #f0f2f5;
+            color: var(--dark-color);
+            border-bottom-left-radius: 5px;
+        }
+        
+        .user .message-bubble {
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 14px;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .chat-input button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 576px) {
+            .chat-box {
+                width: calc(100vw - 60px);
+                right: 15px;
+            }
+            
+            #live-chat-widget {
+                bottom: 50px;
+                left: 20px;
+            }
+        }
+    </style>
+    
+    <div class="chat-toggle" onclick="toggleChat()">
+        <i class="fas fa-comments"></i>
+    </div>
+    
+    <div class="chat-box" id="chatBox">
+        <div class="chat-header">
+            <h3>Live Chat Support</h3>
+            <button class="chat-close" onclick="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message bot">
+                <div class="message-bubble">
+                    Hello! 👋 How can I help you today?
+                </div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+            <button onclick="sendChatMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Live Chat Functionality
+    function toggleChat() {
+        document.getElementById('chatBox').classList.toggle('active');
+    }
+    
+    function handleChatInput(event) {
+        if (event.key === 'Enter') {
+            sendChatMessage();
+        }
+    }
+    
+    function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Add user message
+        addMessageToChat(message, 'user');
+        input.value = '';
+        
+        // Simulate bot response
+        setTimeout(() => {
+            const responses = [
+                "Thanks for your message! Our support team will get back to you shortly.",
+                "I can help you with program information, admission process, or technical support. What would you like to know?",
+                "For immediate assistance, please call us at +1 (234) 567-8900 during business hours.",
+                "Would you like me to connect you with an admissions counselor?",
+                "You can find detailed information about our programs on the Programs page."
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addMessageToChat(randomResponse, 'bot');
+        }, 1000);
+    }
+    
+    function addMessageToChat(message, sender) {
+        const chatBody = document.getElementById('chatBody');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender}`;
+        messageDiv.innerHTML = `<div class="message-bubble">${message}</div>`;
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+</script>
+{% endblock %}

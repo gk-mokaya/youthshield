@@ -1,0 +1,50 @@
+<!-- Floating Donation Button -->
+<style>
+    .floating-donation-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background-color: var(--accent-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: var(--transition);
+        z-index: 1000;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .floating-donation-btn:hover {
+        background-color: #d81159;
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .floating-donation-btn i {
+        color: white;
+        font-size: 24px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .floating-donation-btn {
+            width: 45px;
+            height: 45px;
+            bottom: 53px;
+            right: 15px;
+        }
+
+        .floating-donation-btn i {
+            font-size: 20px;
+        }
+    }
+</style>
+
+<a href="{% url 'donations:donate' %}" class="floating-donation-btn" title="Make a Donation">
+    <i class="fa-solid fa-hand-holding-dollar"></i>
+</a>
