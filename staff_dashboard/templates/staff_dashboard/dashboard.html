@@ -276,11 +276,11 @@
 
         <!-- Right Column -->
         <div class="content-right">
-            <!-- Recent Activity -->
+            <!-- Recent Donations -->
             <div class="activity-container card">
                 <div class="card-header">
-                    <h3><i class="fas fa-history"></i> Recent Activity</h3>
-                    <a href="#" class="view-all">View All</a>
+                    <h3><i class="fas fa-hand-holding-heart"></i> Recent Donations</h3>
+                    <a href="{% url 'staff_dashboard:manage_donations' %}" class="view-all">View All</a>
                 </div>
                 <div class="card-body">
                     <div class="activity-timeline">
@@ -290,36 +290,73 @@
                             <div class="timeline-content">
                                 <div class="activity-header">
                                     <h4 class="activity-title">{{ donation.donor.get_full_name|default:donation.donor.username }}</h4>
-                                    <span class="activity-time">{{ donation.created_at|timesince }} ago</span>
+                                    <span class="activity-time">{{ donation.formatted_time }}</span>
                                 </div>
-                                <p class="activity-description">Donated <strong>${{ donation.amount }}</strong> to {{ donation.program.name|default:"General Fund" }}</p>
+                                <p class="activity-description">Donated <strong>${{ donation.amount }}</strong> in {{ donation.currency }} via {{ donation.payment_method|title }}</p>
                             </div>
                         </div>
-                        {% endfor %}
-                        
-                        {% for user in recent_users %}
-                        <div class="timeline-item">
-                            <div class="timeline-marker user"></div>
-                            <div class="timeline-content">
-                                <div class="activity-header">
-                                    <h4 class="activity-title">New Registration</h4>
-                                    <span class="activity-time">{{ user.date_joined|timesince }} ago</span>
-                                </div>
-                                <p class="activity-description">{{ user.get_full_name|default:user.username }} joined the platform</p>
-                            </div>
+                        {% empty %}
+                        <div class="no-activity">
+                            <i class="fas fa-inbox"></i>
+                            <p>No recent donations</p>
                         </div>
                         {% endfor %}
-                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Messages -->
+            <div class="activity-container card">
+                <div class="card-header">
+                    <h3><i class="fas fa-envelope"></i> Recent Messages</h3>
+                    <a href="{% url 'staff_dashboard:manage_contact_messages' %}" class="view-all">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
                         {% for message in recent_messages %}
                         <div class="timeline-item">
                             <div class="timeline-marker message"></div>
                             <div class="timeline-content">
                                 <div class="activity-header">
                                     <h4 class="activity-title">{{ message.name }}</h4>
-                                    <span class="activity-time">{{ message.created_at|timesince }} ago</span>
+                                    <span class="activity-time">{{ message.formatted_time }}</span>
                                 </div>
-                                <p class="activity-description">Sent a message: "{{ message.message|truncatechars:50 }}"</p>
+                                <p class="activity-description">Subject: "{{ message.subject|truncatechars:40 }}"</p>
                             </div>
+                        </div>
+                        {% empty %}
+                        <div class="no-activity">
+                            <i class="fas fa-inbox"></i>
+                            <p>No recent messages</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Users -->
+            <div class="activity-container card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-plus"></i> Recent Users</h3>
+                    <a href="{% url 'staff_dashboard:manage_users' %}" class="view-all">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        {% for user in recent_users %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker user"></div>
+                            <div class="timeline-content">
+                                <div class="activity-header">
+                                    <h4 class="activity-title">{{ user.get_full_name|default:user.username }}</h4>
+                                    <span class="activity-time">{{ user.formatted_time }}</span>
+                                </div>
+                                <p class="activity-description">New user registration</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="no-activity">
+                            <i class="fas fa-users"></i>
+                            <p>No recent user registrations</p>
                         </div>
                         {% endfor %}
                     </div>

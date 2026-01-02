@@ -874,9 +874,9 @@
         
         <select class="filter-select" id="methodFilter" onchange="applyFilters()">
             <option value="">All Methods</option>
-            <option value="credit_card" {% if method_filter == 'credit_card' %}selected{% endif %}>Credit Card</option>
+            <option value="mpesa" {% if method_filter == 'mpesa' %}selected{% endif %}>M-Pesa</option>
             <option value="paypal" {% if method_filter == 'paypal' %}selected{% endif %}>PayPal</option>
-            <option value="bank_transfer" {% if method_filter == 'bank_transfer' %}selected{% endif %}>Bank Transfer</option>
+            <option value="card" {% if method_filter == 'card' %}selected{% endif %}>Credit/Debit</option>
         </select>
     </div>
 
@@ -1071,11 +1071,9 @@
                 <div class="form-group">
                     <label for="editMethod" class="form-label">Payment Method</label>
                     <select class="form-select" id="editMethod" name="payment_method">
-                        <option value="credit_card">Credit Card</option>
+                        <option value="mpesa">M-Pesa</option>
                         <option value="paypal">PayPal</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="mobile_money">Mobile Money</option>
-                        <option value="cash">Cash</option>
+                        <option value="card">Credit/Debit</option>
                     </select>
                 </div>
             </div>

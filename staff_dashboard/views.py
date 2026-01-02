@@ -24,16 +24,68 @@ def is_staff(user):
 def dashboard(request):
     # Stats cards
     total_users = CustomUser.objects.count()
-    total_donations = Donation.objects.count()
-    total_donation_amount = Donation.objects.aggregate(Sum('amount'))['amount__sum'] or 0
     total_programs = Program.objects.count()
     total_testimonials = Testimonial.objects.count()
     unresolved_messages = ContactMessage.objects.filter(resolved=False).count()
 
-    # Recent activities
+    # Donation stats - consistent with manage_donations
+    from decimal import Decimal
+
+    # Currency conversion rates to KES
+    conversion_rates = {
+        'KES': Decimal('1.0'),
+        'USD': Decimal('130.0'),  # 1 USD = 130 KES
+        'EUR': Decimal('140.0'),  # 1 EUR = 140 KES
+        'GBP': Decimal('160.0'),  # 1 GBP = 160 KES
+    }
+
+    # Total amount only for completed donations, converted to KES
+    completed_donations_queryset = Donation.objects.filter(status='completed')
+    total_donation_amount = Decimal('0')
+    for donation in completed_donations_queryset:
+        rate = conversion_rates.get(donation.currency, Decimal('1.0'))  # Default to 1 if currency not found
+        total_donation_amount += donation.amount * rate
+
+    # Separate counts for each status
+    total_donations = Donation.objects.count()
+    completed_donations = completed_donations_queryset.count()
+    pending_donations = Donation.objects.filter(status='pending').count()
+    failed_donations = Donation.objects.filter(status='failed').count()
+
+    # Today's donations
+    from django.utils import timezone
+    today = timezone.now().date()
+    today_donations = Donation.objects.filter(created_at__date=today).count()
+
+    # Recent activities - separated
     recent_donations = Donation.objects.select_related('donor').order_by('-created_at')[:5]
     recent_users = CustomUser.objects.order_by('-date_joined')[:5]
     recent_messages = ContactMessage.objects.order_by('-created_at')[:5]
+
+    # Add formatted time to recent activities (show actual date/time if > 24 hours, else timesince)
+    from django.utils.timesince import timesince
+    from django.utils import timezone
+
+    for donation in recent_donations:
+        time_diff = timezone.now() - donation.created_at
+        if time_diff.total_seconds() > 86400:  # More than 24 hours
+            donation.formatted_time = donation.created_at.strftime('%Y-%m-%d %H:%M')
+        else:
+            donation.formatted_time = f"{timesince(donation.created_at)} ago"
+
+    for user in recent_users:
+        time_diff = timezone.now() - user.date_joined
+        if time_diff.total_seconds() > 86400:  # More than 24 hours
+            user.formatted_time = user.date_joined.strftime('%Y-%m-%d %H:%M')
+        else:
+            user.formatted_time = f"{timesince(user.date_joined)} ago"
+
+    for message in recent_messages:
+        time_diff = timezone.now() - message.created_at
+        if time_diff.total_seconds() > 86400:  # More than 24 hours
+            message.formatted_time = message.created_at.strftime('%Y-%m-%d %H:%M')
+        else:
+            message.formatted_time = f"{timesince(message.created_at)} ago"
 
     # Chart data for donation trends (last 7 days)
     from django.db.models.functions import TruncDate

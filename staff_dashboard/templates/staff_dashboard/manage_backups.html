@@ -9,24 +9,15 @@
 <style>
     :root {
         --primary-color: #4f46e5;
-        --primary-dark: #4338ca;
         --secondary-color: #7c3aed;
         --success-color: #10b981;
         --warning-color: #f59e0b;
         --danger-color: #ef4444;
-        --info-color: #06b6d4;
         --bg-light: #f8fafc;
         --bg-card: #ffffff;
-        --bg-dark: #1e293b;
         --text-primary: #1e293b;
         --text-secondary: #64748b;
-        --text-muted: #94a3b8;
         --border-color: #e2e8f0;
-        --border-light: #f1f5f9;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     }
 
     .dark-mode {
@@ -34,43 +25,26 @@
         --bg-card: #1e293b;
         --text-primary: #f1f5f9;
         --text-secondary: #cbd5e1;
-        --text-muted: #64748b;
         --border-color: #334155;
-        --border-light: #1e293b;
     }
-
-    * {
-        box-sizing: border-box;
-    }
-
     .backup-container {
-        max-width: 1400px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 2rem;
-        min-height: calc(100vh - 200px);
     }
 
-    /* Header Section */
+    /* Header */
     .backup-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 2rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .backup-title-section {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
     }
 
     .backup-title {
-        font-size: 2rem;
+        font-size: 1.875rem;
         font-weight: 700;
         color: var(--text-primary);
-        margin: 0;
         display: flex;
         align-items: center;
         gap: 0.75rem;
@@ -78,5 +52,889 @@
 
     .backup-title i {
         color: var(--primary-color);
-        font-size: 1.5rem;
     }
+
+    /* Create Backup Card */
+    .create-backup-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 1rem;
+        padding: 2.5rem;
+        color: white;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+    }
+
+    .create-backup-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .create-backup-desc {
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btn-create-backup {
+        background: white;
+        color: var(--primary-color);
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-create-backup:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Backups List */
+    .backups-section {
+        margin-top: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .backups-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .backup-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .backup-item:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .backup-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .backup-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(79, 70, 229, 0.1);
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-size: 1.25rem;
+    }
+
+    .backup-details h4 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .backup-meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .backup-size {
+        background: var(--bg-light);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .backup-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    .btn-download {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+    }
+
+    .btn-download:hover {
+        background: #4338ca;
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--border-color);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    /* Progress Bar */
+    .progress-container {
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .progress-bar {
+        height: 6px;
+        background: var(--border-color);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--success-color);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+
+    .progress-text {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-align: center;
+    }
+
+    /* Modal Styles - FIXED */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999 !important;
+    }
+
+    .modal {
+        background: white; /* Changed from var(--primary-color) */
+        color: var(--text-primary); /* Changed from white */
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--border-color);
+        z-index: 100000 !important;
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--primary-color);
+        border-radius: 1rem 1rem 0 0;
+        color: white;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: white;
+        margin: 0;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .btn-modal {
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-modal-secondary {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-modal-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-modal-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-modal:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Auto Backup Settings */
+    .auto-backup-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .btn-save-settings {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-save-settings:hover {
+        background: #4338ca;
+        transform: translateY(-2px);
+    }
+
+    /* Activity Log */
+    .activity-log {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .log-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .log-item:last-child {
+        border-bottom: none;
+    }
+
+    .log-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+    }
+
+    .log-details {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .log-message {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .log-time {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-log {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-log i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .backup-container {
+            padding: 1rem;
+        }
+
+        .backup-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .backup-item {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .backup-actions {
+            justify-content: flex-end;
+        }
+
+        .auto-backup-card {
+            padding: 1.5rem;
+        }
+
+        .log-details {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="backup-container">
+    <!-- Header -->
+    <div class="backup-header">
+        <div>
+            <h1 class="backup-title">
+                <i class="fas fa-database"></i>
+                Backup Management
+            </h1>
+            <p class="text-muted">Manage and create database backups</p>
+        </div>
+        <div class="date-display">
+            <i class="fas fa-calendar-alt"></i>
+            <span>{{ current_date|date:"F d, Y" }}</span>
+        </div>
+    </div>
+
+    <!-- Create Backup Card -->
+    <div class="create-backup-card">
+        <h3 class="create-backup-title">
+            <i class="fas fa-plus-circle"></i>
+            Create New Backup
+        </h3>
+        <p class="create-backup-desc">
+            Create a complete backup of your database. This process ensures your data is safe and can be restored if needed.
+        </p>
+        <!-- FIXED: Removed console.log from onclick -->
+        <button class="btn-create-backup" id="createBackupBtn" onclick="showCreateBackupModal()">
+            <i class="fas fa-database"></i>
+            Create Backup
+        </button>
+        
+        <div class="progress-container" id="backupProgress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Creating backup...</div>
+        </div>
+    </div>
+
+    <!-- Automatic Backup Settings -->
+    <div class="auto-backup-section">
+        <h3 class="section-title">
+            <i class="fas fa-clock"></i>
+            Automatic Backup Settings
+        </h3>
+        <div class="auto-backup-card">
+            <form id="autoBackupForm" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="backup_frequency">Backup Frequency</label>
+                    <select id="backup_frequency" name="backup_frequency" class="form-control">
+                        <option value="daily" {% if auto_backup.frequency == 'daily' %}selected{% endif %}>Daily</option>
+                        <option value="weekly" {% if auto_backup.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                        <option value="monthly" {% if auto_backup.frequency == 'monthly' %}selected{% endif %}>Monthly</option>
+                        <option value="disabled" {% if auto_backup.frequency == 'disabled' %}selected{% endif %}>Disabled</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="backup_time">Backup Time (HH:MM)</label>
+                    <input type="time" id="backup_time" name="backup_time" value="{{ auto_backup.time|default:'02:00' }}" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="max_backups">Maximum Backups to Keep</label>
+                    <input type="number" id="max_backups" name="max_backups" value="{{ auto_backup.max_backups|default:10 }}" min="1" max="100" class="form-control">
+                </div>
+                <button type="submit" class="btn-save-settings">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Backup Activity Log -->
+    <div class="activity-log-section">
+        <h3 class="section-title">
+            <i class="fas fa-list"></i>
+            Backup Activity Log
+        </h3>
+        <div class="activity-log">
+            {% if backup_logs %}
+                {% for log in backup_logs %}
+                <div class="log-item">
+                    <div class="log-icon">
+                        {% if log.action == 'created' %}
+                            <i class="fas fa-plus-circle text-success"></i>
+                        {% elif log.action == 'deleted' %}
+                            <i class="fas fa-trash text-danger"></i>
+                        {% elif log.action == 'downloaded' %}
+                            <i class="fas fa-download text-info"></i>
+                        {% endif %}
+                    </div>
+                    <div class="log-details">
+                        <span class="log-message">{{ log.message }}</span>
+                        <span class="log-time">{{ log.timestamp|date:"M d, Y H:i:s" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-log">
+                    <i class="fas fa-info-circle"></i>
+                    <p>No backup activities recorded yet.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Existing Backups -->
+    <div class="backups-section">
+        <h3 class="section-title">
+            <i class="fas fa-history"></i>
+            Existing Backups
+        </h3>
+
+        {% if backups %}
+            <div class="backups-list">
+                {% for backup in backups %}
+                <div class="backup-item">
+                    <div class="backup-info">
+                        <div class="backup-icon">
+                            <i class="fas fa-file-archive"></i>
+                        </div>
+                        <div class="backup-details">
+                            <h4>{{ backup.name }}</h4>
+                            <div class="backup-meta">
+                                <span><i class="far fa-clock"></i> {{ backup.created_at|date:"M d, Y H:i" }}</span>
+                                <span class="backup-size">{{ backup.size|filesizeformat }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="backup-actions">
+                        <button class="btn-action btn-download" onclick="downloadBackup('{{ backup.name }}')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="btn-action btn-delete" onclick="showDeleteBackupModal('{{ backup.name }}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3>No Backups Found</h3>
+                <p>Create your first backup to get started</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block modals %}
+<!-- Create Backup Modal -->
+<div class="modal-overlay" id="createBackupModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h4 class="modal-title">Create Backup</h4>
+            <button class="close-modal" onclick="closeCreateBackupModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to create a new database backup?</p>
+            <p class="text-muted">This process may take a few moments depending on your database size.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-modal-secondary" onclick="closeCreateBackupModal()">Cancel</button>
+            <button class="btn-modal btn-modal-primary" id="confirmCreateBackupBtn">Create Backup</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Backup Modal -->
+<div class="modal-overlay" id="deleteBackupModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h4 class="modal-title">Delete Backup</h4>
+            <button class="close-modal" onclick="closeDeleteBackupModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this backup?</p>
+            <p class="text-danger"><strong>File:</strong> <span id="backupFileName"></span></p>
+            <p class="text-muted">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-modal-secondary" onclick="closeDeleteBackupModal()">Cancel</button>
+            <button class="btn-modal btn-modal-danger" onclick="deleteBackup()">Delete Backup</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentBackupName = null;
+
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, setting up event listeners');
+        
+        // Add event listener to create backup button
+        const createBtn = document.getElementById('createBackupBtn');
+        if (createBtn) {
+            console.log('Create button found, adding click listener');
+            createBtn.addEventListener('click', showCreateBackupModal);
+        } else {
+            console.error('Create backup button not found!');
+        }
+
+        // Add event listener to confirm create backup button
+        const confirmBtn = document.getElementById('confirmCreateBackupBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', createBackup);
+        }
+
+        // Check if modal exists
+        const modal = document.getElementById('createBackupModal');
+        if (modal) {
+            console.log('Modal element exists in DOM');
+        } else {
+            console.error('Modal element not found in DOM');
+        }
+    });
+
+    // Modal Functions
+    function showCreateBackupModal() {
+        console.log('showCreateBackupModal called');
+        const modal = document.getElementById('createBackupModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            console.log('Modal should be visible now');
+            
+            // Force reflow to ensure display change is applied
+            modal.offsetHeight;
+            
+            // Debug: Check if modal is visible
+            const style = window.getComputedStyle(modal);
+            console.log('Modal display:', style.display);
+            console.log('Modal opacity:', style.opacity);
+            console.log('Modal visibility:', style.visibility);
+        } else {
+            console.error('Modal element not found');
+        }
+    }
+
+    function closeCreateBackupModal() {
+        const modal = document.getElementById('createBackupModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    function showDeleteBackupModal(backupName) {
+        currentBackupName = backupName;
+        document.getElementById('backupFileName').textContent = backupName;
+        const modal = document.getElementById('deleteBackupModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeDeleteBackupModal() {
+        const modal = document.getElementById('deleteBackupModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Close modals when clicking outside
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Backup Functions
+    function createBackup() {
+        const modal = document.getElementById('createBackupModal');
+        const progress = document.getElementById('backupProgress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        
+        if (!progress || !progressFill || !progressText) {
+            console.error('Progress elements not found');
+            return;
+        }
+        
+        // Show progress
+        progress.style.display = 'block';
+        if (modal) {
+            modal.style.display = 'none';
+        }
+        
+        // Simulate progress
+        let width = 0;
+        const interval = setInterval(() => {
+            width += 5;
+            progressFill.style.width = width + '%';
+            
+            if (width >= 100) {
+                clearInterval(interval);
+                progressText.textContent = 'Backup created successfully!';
+                
+                // In real implementation, make API call here
+                fetch('/staff/backups/create/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alert('Failed to create backup. Please try again.');
+                        progress.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                    progress.style.display = 'none';
+                });
+            }
+        }, 100);
+    }
+
+    function downloadBackup(backupName) {
+        window.location.href = `/staff/backups/${backupName}/download/`;
+    }
+
+    function deleteBackup() {
+        fetch(`/staff/backups/${currentBackupName}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to delete backup. Please try again.');
+                closeDeleteBackupModal();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+            closeDeleteBackupModal();
+        });
+    }
+
+    // Auto Backup Settings
+    document.addEventListener('DOMContentLoaded', function() {
+        const autoBackupForm = document.getElementById('autoBackupForm');
+        if (autoBackupForm) {
+            autoBackupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+                const data = {
+                    frequency: formData.get('backup_frequency'),
+                    time: formData.get('backup_time'),
+                    max_backups: formData.get('max_backups')
+                };
+
+                fetch('/staff/backups/save-auto-backup-settings/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Automatic backup settings saved successfully!');
+                    } else {
+                        alert('Failed to save settings. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        }
+    });
+
+    // Utility function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}
