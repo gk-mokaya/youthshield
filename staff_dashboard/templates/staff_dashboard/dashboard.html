@@ -82,7 +82,7 @@
                     <i class="fas fa-hand-holding-heart"></i>
                 </div>
                 <div class="card-content">
-                    <h3 class="stat-value">${{ total_donation_amount|floatformat:0 }}</h3>
+                    <h3 class="stat-value">KES:{{ total_donation_amount|floatformat:0 }}</h3>
                     <p class="stat-label">Total Donated</p>
                     <div class="stat-trend">
                         <i class="fas fa-arrow-up trend-up"></i>
@@ -413,7 +413,7 @@
     </div>
 </div>
 
-<script>
+<script id="dashboard-script">
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Chart
     const ctx = document.getElementById('donationChart').getContext('2d');
@@ -675,8 +675,33 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             document.querySelectorAll('.btn-period').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-            // In a real app, you would fetch new data based on the selected period
-            alert('Period changed to ' + this.dataset.period);
+            const period = this.dataset.period;
+
+            // Fetch new data for the selected period using AJAX
+            fetch(`/staff/chart-data/?period=${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update the chart with the new data
+                    donationChart.data.labels = data.chart_labels;
+                    donationChart.data.datasets[0].data = data.chart_data;
+                    donationChart.update();
+
+                    // Update the summary values
+                    const summaryContainer = this.closest('.chart-container').querySelector('.chart-summary');
+                    if (summaryContainer) {
+                        const summaryItems = summaryContainer.querySelectorAll('.summary-item');
+                        if (summaryItems.length >= 3) {
+                            summaryItems[0].querySelector('.summary-value').textContent = `$${data.weekly_total}`;
+                            summaryItems[1].querySelector('.summary-value').textContent = `$${data.daily_avg}`;
+                            summaryItems[2].querySelector('.summary-value').textContent = `${data.growth_rate}%`;
+                            summaryItems[2].querySelector('.summary-value').className = `summary-value ${data.growth_rate >= 0 ? 'trend-up' : 'trend-down'}`;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching chart data:', error);
+                    alert('Failed to load chart data for the selected period.');
+                });
         });
     });
 

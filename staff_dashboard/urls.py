@@ -6,6 +6,7 @@ app_name = 'staff_dashboard'
 
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
+    path('chart-data/', views.dashboard_chart_data, name='dashboard_chart_data'),
     path('users/', views.manage_users, name='manage_users'),
     path('donations/', views.manage_donations, name='manage_donations'),
     path('programs/', views.manage_programs, name='manage_programs'),

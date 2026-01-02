@@ -21,7 +21,102 @@ def is_staff(user):
 
 @login_required
 @user_passes_test(is_staff)
+def dashboard_chart_data(request):
+    """AJAX endpoint for dashboard chart data"""
+    period = request.GET.get('period', '7d')
+
+    # Chart data for donation trends - dynamic period - only allowed payment methods
+    from django.db.models.functions import TruncDate
+    from django.db.models import Case, When, F, DecimalField
+    from datetime import timedelta
+    from django.utils import timezone
+
+    # Calculate date range based on period using local timezone
+    from django.utils import timezone
+    from datetime import timedelta
+
+    # Get current date in the application's timezone (Africa/Nairobi)
+    current_tz = timezone.get_current_timezone()
+    now_local = timezone.now().astimezone(current_tz)
+    end_date = now_local.date()
+
+    if period == '7d':
+        start_date = end_date - timedelta(days=6)
+        date_format = '%b %d'  # e.g., "Jan 15"
+    elif period == '30d':
+        start_date = end_date - timedelta(days=29)
+        date_format = '%b %d'  # e.g., "Jan 15"
+    elif period == '90d':
+        start_date = end_date - timedelta(days=89)
+        date_format = '%b %d'  # e.g., "Jan 15"
+    else:
+        # Default to 7 days
+        start_date = end_date - timedelta(days=6)
+        date_format = '%b %d'
+
+    # Define allowed payment methods
+    allowed_methods = ['mpesa', 'paypal', 'card']
+
+    # Convert all amounts to KES before aggregating
+    donation_trends = Donation.objects.filter(
+        created_at__date__range=[start_date, end_date],
+        payment_method__in=allowed_methods
+    ).annotate(
+        converted_amount=Case(
+            When(currency='USD', then=F('amount') * 130),
+            When(currency='EUR', then=F('amount') * 140),
+            When(currency='GBP', then=F('amount') * 160),
+            default=F('amount'),  # KES
+            output_field=DecimalField()
+        )
+    ).annotate(date=TruncDate('created_at')) \
+    .values('date') \
+    .annotate(total=Sum('converted_amount')) \
+    .order_by('date')
+
+    chart_labels = []
+    chart_data = []
+    current_date = start_date
+    while current_date <= end_date:
+        chart_labels.append(current_date.strftime(date_format))
+        amount = next((item['total'] for item in donation_trends if item['date'] == current_date), 0)
+        chart_data.append(float(amount))
+        current_date += timedelta(days=1)
+
+    # Calculate weekly total and daily average in KES
+    weekly_total_kes = sum(chart_data[-7:]) if len(chart_data) >= 7 else sum(chart_data)
+    daily_avg_kes = weekly_total_kes / 7 if len(chart_data) >= 7 else (weekly_total_kes / len(chart_data) if chart_data else 0)
+
+    # Convert to USD for display (1 USD = 130 KES)
+    weekly_total = weekly_total_kes / 130
+    daily_avg = daily_avg_kes / 130
+
+    # Calculate growth rate (simplified - comparing last 7 days to previous 7 days)
+    if len(chart_data) >= 14:
+        previous_week = sum(chart_data[-14:-7])
+        current_week = sum(chart_data[-7:])
+        growth_rate = ((current_week - previous_week) / previous_week * 100) if previous_week > 0 else 0
+    else:
+        growth_rate = 0
+
+    return JsonResponse({
+        'chart_labels': chart_labels,
+        'chart_data': chart_data,
+        'weekly_total': weekly_total,
+        'daily_avg': daily_avg,
+        'growth_rate': growth_rate,
+    })
+
+@login_required
+@user_passes_test(is_staff)
 def dashboard(request):
+    # Check if this is an AJAX request for chart data
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return dashboard_chart_data(request)
+
+    # Get period parameter for donation trends (default to 7d)
+    period = request.GET.get('period', '7d')
+
     # Stats cards
     total_users = CustomUser.objects.count()
     total_programs = Program.objects.count()
@@ -54,8 +149,13 @@ def dashboard(request):
 
     # Today's donations
     from django.utils import timezone
-    today = timezone.now().date()
+    current_tz = timezone.get_current_timezone()
+    now_local = timezone.now().astimezone(current_tz)
+    today = now_local.date()
     today_donations = Donation.objects.filter(created_at__date=today).count()
+
+    # Define allowed payment methods
+    allowed_methods = ['mpesa', 'paypal', 'card']
 
     # Recent activities - separated
     recent_donations = Donation.objects.select_related('donor').order_by('-created_at')[:5]
@@ -87,27 +187,68 @@ def dashboard(request):
         else:
             message.formatted_time = f"{timesince(message.created_at)} ago"
 
-    # Chart data for donation trends (last 7 days)
+    # Chart data for donation trends - dynamic period - only allowed payment methods
     from django.db.models.functions import TruncDate
+    from django.db.models import Case, When, F, DecimalField
     from datetime import timedelta
     from django.utils import timezone
 
-    end_date = timezone.now().date()
-    start_date = end_date - timedelta(days=6)
-    donation_trends = Donation.objects.filter(created_at__date__range=[start_date, end_date]) \
-        .annotate(date=TruncDate('created_at')) \
-        .values('date') \
-        .annotate(total=Sum('amount')) \
-        .order_by('date')
+    # Calculate date range based on period using local timezone
+    current_tz = timezone.get_current_timezone()
+    now_local = timezone.now().astimezone(current_tz)
+    end_date = now_local.date()
+
+    if period == '7d':
+        start_date = end_date - timedelta(days=6)
+        date_format = '%b %d'  # e.g., "Jan 15"
+    elif period == '30d':
+        start_date = end_date - timedelta(days=29)
+        date_format = '%b %d'  # e.g., "Jan 15"
+    elif period == '90d':
+        start_date = end_date - timedelta(days=89)
+        date_format = '%b %d'  # e.g., "Jan 15"
+    else:
+        # Default to 7 days
+        start_date = end_date - timedelta(days=6)
+        date_format = '%b %d'
+
+    # Convert all amounts to KES before aggregating
+    donation_trends = Donation.objects.filter(
+        created_at__date__range=[start_date, end_date],
+        payment_method__in=allowed_methods
+    ).annotate(
+        converted_amount=Case(
+            When(currency='USD', then=F('amount') * 130),
+            When(currency='EUR', then=F('amount') * 140),
+            When(currency='GBP', then=F('amount') * 160),
+            default=F('amount'),  # KES
+            output_field=DecimalField()
+        )
+    ).annotate(date=TruncDate('created_at')) \
+    .values('date') \
+    .annotate(total=Sum('converted_amount')) \
+    .order_by('date')
 
     chart_labels = []
     chart_data = []
     current_date = start_date
     while current_date <= end_date:
-        chart_labels.append(current_date.strftime('%b %d'))
+        chart_labels.append(current_date.strftime(date_format))
         amount = next((item['total'] for item in donation_trends if item['date'] == current_date), 0)
         chart_data.append(float(amount))
         current_date += timedelta(days=1)
+
+    # Calculate weekly total and daily average in KES
+    weekly_total = sum(chart_data[-7:]) if len(chart_data) >= 7 else sum(chart_data)
+    daily_avg = weekly_total / 7 if len(chart_data) >= 7 else (weekly_total / len(chart_data) if chart_data else 0)
+
+    # Calculate growth rate (simplified - comparing last 7 days to previous 7 days)
+    if len(chart_data) >= 14:
+        previous_week = sum(chart_data[-14:-7])
+        current_week = sum(chart_data[-7:])
+        growth_rate = ((current_week - previous_week) / previous_week * 100) if previous_week > 0 else 0
+    else:
+        growth_rate = 0
 
     # User registration trends (last 30 days)
     end_date_users = timezone.now().date()
@@ -131,8 +272,9 @@ def dashboard(request):
     total_users_month = sum(user_chart_data)
     avg_daily_users = total_users_month / 30 if total_users_month > 0 else 0
 
-    # Payment method distribution
-    payment_methods = Donation.objects.values('payment_method').annotate(count=Count('id')).order_by('-count')
+    # Payment method distribution - only allowed methods
+    allowed_methods = ['mpesa', 'paypal', 'card']
+    payment_methods = Donation.objects.filter(payment_method__in=allowed_methods).values('payment_method').annotate(count=Count('id')).order_by('-count')
     payment_labels = []
     payment_data = []
     payment_colors = []
@@ -305,7 +447,9 @@ def manage_donations(request):
     failed_donations = Donation.objects.filter(status='failed').count()
 
     # Today's donations
-    today = timezone.now().date()
+    current_tz = timezone.get_current_timezone()
+    now_local = timezone.now().astimezone(current_tz)
+    today = now_local.date()
     today_donations = Donation.objects.filter(created_at__date=today).count()
 
     # Recent stats (last 30 days)
