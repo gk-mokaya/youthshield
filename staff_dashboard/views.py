@@ -239,8 +239,12 @@ def dashboard(request):
         current_date += timedelta(days=1)
 
     # Calculate weekly total and daily average in KES
-    weekly_total = sum(chart_data[-7:]) if len(chart_data) >= 7 else sum(chart_data)
-    daily_avg = weekly_total / 7 if len(chart_data) >= 7 else (weekly_total / len(chart_data) if chart_data else 0)
+    weekly_total_kes = sum(chart_data[-7:]) if len(chart_data) >= 7 else sum(chart_data)
+    daily_avg_kes = weekly_total_kes / 7 if len(chart_data) >= 7 else (weekly_total_kes / len(chart_data) if chart_data else 0)
+
+    # Convert to USD for display (1 USD = 130 KES)
+    weekly_total = weekly_total_kes / 130
+    daily_avg = daily_avg_kes / 130
 
     # Calculate growth rate (simplified - comparing last 7 days to previous 7 days)
     if len(chart_data) >= 14:
