@@ -1,0 +1,978 @@
+{% extends 'staff_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Testimonial Management | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff-dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #4f46e5;
+        --secondary-color: #7c3aed;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --bg-light: #f8fafc;
+        --bg-card: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    .dark-mode {
+        --bg-light: #0f172a;
+        --bg-card: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-color: #334155;
+    }
+
+    .testimonials-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* Header */
+    .testimonials-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .testimonials-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .testimonials-title i {
+        color: var(--primary-color);
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        min-width: 120px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    /* Action Header */
+    .action-header {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+
+    .filter-select {
+        padding: 0.875rem 1rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        min-width: 150px;
+    }
+
+    /* Testimonials Grid */
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .testimonial-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .testimonial-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+    }
+
+    .testimonial-card.pending {
+        border-left: 4px solid var(--warning-color);
+    }
+
+    .testimonial-card.approved {
+        border-left: 4px solid var(--success-color);
+    }
+
+    .testimonial-card.rejected {
+        border-left: 4px solid var(--danger-color);
+    }
+
+    .testimonial-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .user-info {
+        flex: 1;
+    }
+
+    .user-name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .user-position {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .testimonial-status {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .status-approved {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-rejected {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .testimonial-content {
+        color: var(--text-primary);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        font-style: italic;
+        position: relative;
+        padding-left: 1rem;
+    }
+
+    .testimonial-content:before {
+        content: '"';
+        position: absolute;
+        left: 0;
+        top: -0.5rem;
+        font-size: 2rem;
+        color: var(--primary-color);
+        opacity: 0.2;
+        font-family: Georgia, serif;
+    }
+
+    .testimonial-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .testimonial-date {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .testimonial-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-edit {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #4338ca;
+    }
+
+    .btn-approve {
+        background: var(--success-color);
+        color: white;
+    }
+
+    .btn-approve:hover {
+        background: #0da271;
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-reject {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-reject:hover {
+        background: #dc2626;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+        grid-column: 1 / -1;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--border-color);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 3rem;
+        gap: 0.5rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .pagination-btn:hover:not(.disabled) {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .testimonial-modal {
+        background: var(--bg-card);
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.25rem;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .form-check-label {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .btn-modal {
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-modal-secondary {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-modal-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-modal-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .testimonials-container {
+            padding: 1rem;
+        }
+
+        .testimonials-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .header-stats {
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            min-width: calc(50% - 0.75rem);
+        }
+
+        .action-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .testimonials-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .testimonial-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .testimonial-status {
+            position: relative;
+            top: auto;
+            right: auto;
+            margin-top: 0.5rem;
+        }
+
+        .testimonial-meta {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .testimonial-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="testimonials-container">
+    <!-- Header -->
+    <div class="testimonials-header">
+        <div>
+            <h1 class="testimonials-title">
+                <i class="fas fa-star"></i>
+                Testimonial Management
+            </h1>
+            <p class="text-muted">Review and moderate user testimonials</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ total_testimonials }}</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ approved_testimonials }}</span>
+                <span class="stat-label">Approved</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ pending_testimonials }}</span>
+                <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ rejected_testimonials }}</span>
+                <span class="stat-label">Rejected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Header -->
+    <div class="action-header">
+        <div class="search-box">
+            <input type="text" 
+                   class="search-input" 
+                   id="searchInput" 
+                   placeholder="Search by user, content, or position..." 
+                   value="{{ search_query }}">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+        
+        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+    </div>
+
+    <!-- Testimonials Grid -->
+    <div class="testimonials-grid">
+        {% for testimonial in page_obj %}
+        <div class="testimonial-card {{ testimonial.status }}">
+            <div class="testimonial-header">
+                <div class="user-avatar">
+                    {{ testimonial.user.username|first|upper }}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ testimonial.user.get_full_name|default:testimonial.user.username }}</div>
+                    <div class="user-position">
+                        {% if testimonial.position %}
+                            {{ testimonial.position }}
+                        {% else %}
+                            User
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="testimonial-status">
+                    {% if testimonial.status == 'approved' %}
+                    <span class="status-badge status-approved">
+                        <i class="fas fa-check-circle"></i> Approved
+                    </span>
+                    {% elif testimonial.status == 'pending' %}
+                    <span class="status-badge status-pending">
+                        <i class="fas fa-clock"></i> Pending Review
+                    </span>
+                    {% elif testimonial.status == 'rejected' %}
+                    <span class="status-badge status-rejected">
+                        <i class="fas fa-times-circle"></i> Rejected
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="testimonial-content">
+                {{ testimonial.content|truncatechars:200 }}
+            </div>
+
+            <div class="testimonial-meta">
+                <div class="testimonial-date">
+                    <i class="far fa-calendar"></i> {{ testimonial.created_at|date:"M d, Y" }}
+                </div>
+
+                <div class="testimonial-actions">
+                    <button class="btn-action btn-edit" onclick="showEditModal({{ testimonial.id }})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    {% if testimonial.status == 'pending' %}
+                    <button class="btn-action btn-approve" onclick="approveTestimonial({{ testimonial.id }})">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="btn-action btn-reject" onclick="rejectTestimonial({{ testimonial.id }})">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                    {% endif %}
+                    <button class="btn-action btn-delete" onclick="showDeleteModal({{ testimonial.id }})">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-star"></i>
+            </div>
+            <h3>No Testimonials Found</h3>
+            <p>No testimonials to display</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        {% if page_obj.has_previous %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.previous_page_number }})">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="pagination-btn active">{{ num }}</button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button class="pagination-btn" onclick="goToPage({{ num }})">{{ num }}</button>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.next_page_number }})">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Edit Testimonial Modal -->
+<div class="modal-overlay" id="editModal">
+    <div class="testimonial-modal">
+        <div class="modal-header">
+            <h4 class="modal-title">Edit Testimonial</h4>
+            <button class="close-modal" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form id="editTestimonialForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="testimonialContent" class="form-label">Testimonial Content</label>
+                    <textarea class="form-textarea" 
+                              id="testimonialContent" 
+                              name="content" 
+                              rows="5"
+                              required 
+                              placeholder="Enter testimonial content"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testimonialPosition" class="form-label">Position (Optional)</label>
+                    <input type="text" 
+                           class="form-input" 
+                           id="testimonialPosition" 
+                           name="position" 
+                           placeholder="e.g., Software Engineer, Marketing Director">
+                </div>
+                
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" 
+                               class="form-check-input" 
+                               id="testimonialApproved" 
+                               name="is_approved">
+                        <label class="form-check-label" for="testimonialApproved">
+                            Approve this testimonial
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal btn-modal-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-modal btn-modal-primary">Update Testimonial</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Testimonial Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="testimonial-modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h4 class="modal-title">Delete Testimonial</h4>
+            <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this testimonial?</p>
+            <p class="text-muted">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-modal-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn-modal btn-modal-danger" onclick="deleteTestimonial()">Delete Testimonial</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentTestimonialId = null;
+
+    // Filter Functions
+    function applyFilters() {
+        const search = document.getElementById('searchInput').value;
+        const status = document.getElementById('statusFilter').value;
+        
+        const url = new URL(window.location);
+        
+        if (search) {
+            url.searchParams.set('search', search);
+        } else {
+            url.searchParams.delete('search');
+        }
+        
+        if (status) {
+            url.searchParams.set('status', status);
+        } else {
+            url.searchParams.delete('status');
+        }
+        
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyFilters();
+        }
+    });
+
+    // Pagination
+    function goToPage(page) {
+        const url = new URL(window.location);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+
+    // Edit Modal Functions
+    function showEditModal(testimonialId) {
+        currentTestimonialId = testimonialId;
+        
+        fetch(`/staff/get-testimonial/${testimonialId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('testimonialContent').value = data.content;
+                document.getElementById('testimonialPosition').value = data.position;
+                document.getElementById('testimonialApproved').checked = data.is_approved;
+                
+                document.getElementById('editModal').style.display = 'flex';
+            });
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Delete Modal Functions
+    function showDeleteModal(testimonialId) {
+        currentTestimonialId = testimonialId;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    // Approve Testimonial
+    function approveTestimonial(testimonialId) {
+        fetch(`/staff/approve-testimonial/${testimonialId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    // Reject Testimonial
+    function rejectTestimonial(testimonialId) {
+        fetch(`/staff/reject-testimonial/${testimonialId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    // Form Submission
+    document.getElementById('editTestimonialForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(`/staff/update-testimonial/${currentTestimonialId}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    });
+
+    // Delete Testimonial
+    function deleteTestimonial() {
+        fetch(`/staff/delete-testimonial/${currentTestimonialId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+
+    // Utility function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

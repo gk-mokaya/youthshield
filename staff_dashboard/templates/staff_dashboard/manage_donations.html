@@ -1,0 +1,1285 @@
+{% extends 'staff_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Donation Management | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff-dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #4f46e5;
+        --secondary-color: #7c3aed;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --bg-light: #f8fafc;
+        --bg-card: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    .dark-mode {
+        --bg-light: #0f172a;
+        --bg-card: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-color: #334155;
+    }
+
+    .donations-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* Header */
+    .donations-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .donations-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .donations-title i {
+        color: var(--primary-color);
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        min-width: 120px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    /* Search and Filters */
+    .filters-container {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+
+    .filter-select {
+        padding: 0.875rem 1rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        min-width: 150px;
+    }
+
+    /* Donations Grid */
+    .donations-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .donation-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .donation-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .donation-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .donation-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .donor-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .donor-info h4 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .donor-email {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .donation-status {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .status-completed {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-failed {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .donation-time {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .donation-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .amount {
+        color: var(--success-color);
+        font-size: 1.25rem;
+    }
+
+    .donation-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-edit {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #4338ca;
+    }
+
+    .btn-receipt {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-receipt:hover {
+        background: var(--border-color);
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--border-color);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        gap: 0.5rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .pagination-btn:hover:not(.disabled) {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .toast {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 300px;
+        max-width: 500px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .toast.success {
+        border-left-color: var(--success-color);
+    }
+
+    .toast.error {
+        border-left-color: var(--danger-color);
+    }
+
+    .toast.warning {
+        border-left-color: var(--warning-color);
+    }
+
+    .toast-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .toast.success .toast-icon {
+        color: var(--success-color);
+    }
+
+    .toast.error .toast-icon {
+        color: var(--danger-color);
+    }
+
+    .toast.warning .toast-icon {
+        color: var(--warning-color);
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .toast-message {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 1.25rem;
+        line-height: 1;
+        padding: 0;
+        flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+        color: var(--text-primary);
+    }
+
+    /* Modern Table Styles */
+    .donations-table-container {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .donations-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .donations-table thead {
+        background: var(--bg-light);
+    }
+
+    .donations-table th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .donations-table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+        vertical-align: middle;
+    }
+
+    .donations-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .donations-table tbody tr:hover {
+        background: var(--bg-light);
+    }
+
+    .donor-info-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .donor-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .donor-details h4 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .donor-email {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin: 0;
+    }
+
+    .amount-cell {
+        font-weight: 700;
+        font-size: 1.125rem;
+        color: var(--success-color);
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        text-transform: capitalize;
+    }
+
+    .status-completed {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-failed {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .status-refunded {
+        background: rgba(139, 92, 246, 0.1);
+        color: #7c3aed;
+    }
+
+    .time-cell {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .actions-cell {
+        text-align: right;
+    }
+
+    .table-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .btn-action {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #4338ca;
+        transform: translateY(-1px);
+    }
+
+    .btn-receipt {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-receipt:hover {
+        background: var(--border-color);
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .donation-modal {
+        background: var(--bg-card);
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.25rem;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .form-input, .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .btn-modal {
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-modal-secondary {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-modal-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-modal-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .donations-container {
+            padding: 1rem;
+        }
+
+        .donations-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .header-stats {
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            min-width: calc(50% - 0.75rem);
+        }
+
+        .filters-container {
+            flex-direction: column;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .donation-header {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .donation-status {
+            align-self: flex-start;
+        }
+
+        .donation-details {
+            grid-template-columns: 1fr;
+        }
+
+        .donation-actions {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="donations-container">
+    <!-- Header -->
+    <div class="donations-header">
+        <div>
+            <h1 class="donations-title">
+                <i class="fas fa-hand-holding-heart"></i>
+                Donation Management
+            </h1>
+            <p class="text-muted">View and manage all donation records</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ total_donations }}</span>
+                <span class="stat-label">Total Donations</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">KES {{ total_amount|floatformat:0 }}</span>
+                <span class="stat-label">Total Amount (Completed)</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ completed_donations }}</span>
+                <span class="stat-label">Completed</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ pending_donations }}</span>
+                <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ failed_donations }}</span>
+                <span class="stat-label">Failed</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ today_donations }}</span>
+                <span class="stat-label">Today</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conversion Rates Info -->
+    <div class="conversion-rates-container" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem; margin-bottom: 2rem;">
+        <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">Currency Conversion Rates (to KES)</h4>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            {% for currency, rate in conversion_rates.items %}
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">
+                1 {{ currency }} = {{ rate }} KES
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="filters-container">
+        <div class="search-box">
+            <input type="text" 
+                   class="search-input" 
+                   id="searchInput" 
+                   placeholder="Search by donor, amount, or transaction ID..." 
+                   value="{{ search_query }}">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+        
+        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="failed" {% if status_filter == 'failed' %}selected{% endif %}>Failed</option>
+        </select>
+        
+        <select class="filter-select" id="methodFilter" onchange="applyFilters()">
+            <option value="">All Methods</option>
+            <option value="credit_card" {% if method_filter == 'credit_card' %}selected{% endif %}>Credit Card</option>
+            <option value="paypal" {% if method_filter == 'paypal' %}selected{% endif %}>PayPal</option>
+            <option value="bank_transfer" {% if method_filter == 'bank_transfer' %}selected{% endif %}>Bank Transfer</option>
+        </select>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Donations Table -->
+    <div class="donations-table-container">
+        <table class="donations-table">
+            <thead>
+                <tr>
+                    <th>Donor</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Transaction ID</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for donation in page_obj %}
+                <tr>
+                    <td>
+                        <div class="donor-info-cell">
+                            <div class="donor-avatar">
+                                {% if donation.user %}
+                                    {{ donation.user.username|first|upper }}
+                                {% else %}
+                                    A
+                                {% endif %}
+                            </div>
+                            <div class="donor-details">
+                                <h4>
+                                    {% if donation.user %}
+                                        {{ donation.user.get_full_name|default:donation.user.username }}
+                                    {% else %}
+                                        {{ donation.donor_name|default:"Anonymous Donor" }}
+                                    {% endif %}
+                                </h4>
+                                <div class="donor-email">
+                                    {% if donation.user and donation.user.email %}
+                                        {{ donation.user.email }}
+                                    {% else %}
+                                        {{ donation.donor_email|default:"No email provided" }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="amount-cell">
+                            {{ donation.amount }}
+                            <small style="color: var(--text-secondary); font-weight: normal;">{{ donation.currency }}</small>
+                        </div>
+                    </td>
+                    <td>{{ donation.payment_method|title }}</td>
+                    <td>
+                        {% if donation.status == 'completed' %}
+                        <span class="status-badge status-completed">
+                            <i class="fas fa-check-circle"></i> Completed
+                        </span>
+                        {% elif donation.status == 'pending' %}
+                        <span class="status-badge status-pending">
+                            <i class="fas fa-clock"></i> Pending
+                        </span>
+                        {% elif donation.status == 'failed' %}
+                        <span class="status-badge status-failed">
+                            <i class="fas fa-times-circle"></i> Failed
+                        </span>
+                        {% elif donation.status == 'refunded' %}
+                        <span class="status-badge status-refunded">
+                            <i class="fas fa-undo"></i> Refunded
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if donation.transaction_id %}
+                            {{ donation.transaction_id|truncatechars:10 }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="time-cell">
+                            <i class="far fa-clock"></i> {{ donation.created_at|date:"M d, Y H:i" }}
+                        </div>
+                    </td>
+                    <td class="actions-cell">
+                        <div class="table-actions">
+                            <button class="btn-action btn-edit" onclick="showEditModal({{ donation.id }})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            {% if donation.receipt_number %}
+                            <button class="btn-action btn-receipt" onclick="viewReceipt({{ donation.id }})">
+                                <i class="fas fa-file-pdf"></i> Receipt
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 4rem 2rem;">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-hand-holding-heart"></i>
+                            </div>
+                            <h3>No Donations Found</h3>
+                            <p>No donation records to display</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        {% if page_obj.has_previous %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.previous_page_number }})">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="pagination-btn active">{{ num }}</button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button class="pagination-btn" onclick="goToPage({{ num }})">{{ num }}</button>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.next_page_number }})">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Edit Donation Modal -->
+<div class="modal-overlay" id="editModal">
+    <div class="donation-modal">
+        <div class="modal-header">
+            <h4 class="modal-title">Edit Donation</h4>
+            <button class="close-modal" onclick="closeEditModal()">&times;</button>
+        </div>
+        <form id="editDonationForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="editAmount" class="form-label">Amount</label>
+                    <input type="number" 
+                           class="form-input" 
+                           id="editAmount" 
+                           name="amount" 
+                           step="0.01" 
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editCurrency" class="form-label">Currency</label>
+                    <select class="form-select" id="editCurrency" name="currency">
+                        <option value="KES">KES - Kenyan Shilling</option>
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editStatus" class="form-label">Status</label>
+                    <select class="form-select" id="editStatus" name="status">
+                        <option value="pending">Pending</option>
+                        <option value="completed">Completed</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editMethod" class="form-label">Payment Method</label>
+                    <select class="form-select" id="editMethod" name="payment_method">
+                        <option value="credit_card">Credit Card</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="mobile_money">Mobile Money</option>
+                        <option value="cash">Cash</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal btn-modal-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-modal btn-modal-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentDonationId = null;
+
+    // Toast Notification Functions
+    function showToast(message, type = 'success', title = null) {
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        // Set default titles based on type
+        if (!title) {
+            switch(type) {
+                case 'success':
+                    title = 'Success';
+                    break;
+                case 'error':
+                    title = 'Error';
+                    break;
+                case 'warning':
+                    title = 'Warning';
+                    break;
+                default:
+                    title = 'Notification';
+            }
+        }
+
+        toast.innerHTML = `
+            <div class="toast-icon">
+                ${type === 'success' ? '<i class="fas fa-check-circle"></i>' :
+                  type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' :
+                  type === 'warning' ? '<i class="fas fa-exclamation-triangle"></i>' :
+                  '<i class="fas fa-info-circle"></i>'}
+            </div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close" onclick="closeToast(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        toastContainer.appendChild(toast);
+
+        // Trigger animation
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 100);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            closeToast(toast.querySelector('.toast-close'));
+        }, 5000);
+    }
+
+    function closeToast(closeBtn) {
+        const toast = closeBtn.closest('.toast');
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
+
+    // Filter Functions
+    function applyFilters() {
+        const search = document.getElementById('searchInput').value;
+        const status = document.getElementById('statusFilter').value;
+        const method = document.getElementById('methodFilter').value;
+
+        const url = new URL(window.location);
+
+        if (search) {
+            url.searchParams.set('search', search);
+        } else {
+            url.searchParams.delete('search');
+        }
+
+        if (status) {
+            url.searchParams.set('status', status);
+        } else {
+            url.searchParams.delete('status');
+        }
+
+        if (method) {
+            url.searchParams.set('method', method);
+        } else {
+            url.searchParams.delete('method');
+        }
+
+        url.searchParams.set('page', '1');
+        window.location.href = url.toString();
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            applyFilters();
+        }
+    });
+
+    // Pagination
+    function goToPage(page) {
+        const url = new URL(window.location);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+
+    // Edit Modal Functions
+    function showEditModal(donationId) {
+        currentDonationId = donationId;
+
+        fetch(`/staff/donations/${donationId}/get/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editAmount').value = data.amount;
+                document.getElementById('editCurrency').value = data.currency;
+                document.getElementById('editStatus').value = data.status;
+                document.getElementById('editMethod').value = data.payment_method;
+
+                document.getElementById('editModal').style.display = 'flex';
+            })
+            .catch(error => {
+                showToast('Failed to load donation details', 'error');
+            });
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // View Receipt
+    function viewReceipt(donationId) {
+        window.open(`/donations/receipt/${donationId}/`, '_blank');
+    }
+
+    // Form Submission
+    document.getElementById('editDonationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch(`/staff/donations/${currentDonationId}/edit/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Donation updated successfully', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                showToast(data.message || 'Failed to update donation', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('An error occurred while updating the donation', 'error');
+        });
+    });
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+
+    // Utility function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

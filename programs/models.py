@@ -23,6 +23,10 @@ class Program(models.Model):
     class Meta:
         ordering = ['title']
     
+    def get_objectives_list(self):
+        """Return first 3 objectives as a list"""
+        return [obj.strip() for obj in self.objectives.split('\n')[:3] if obj.strip()]
+
     def __str__(self):
         return self.title
 

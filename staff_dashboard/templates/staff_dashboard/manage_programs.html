@@ -1,0 +1,971 @@
+{% extends 'staff_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Program Management | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff-dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #4f46e5;
+        --secondary-color: #7c3aed;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --bg-light: #f8fafc;
+        --bg-card: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    .dark-mode {
+        --bg-light: #0f172a;
+        --bg-card: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-color: #334155;
+    }
+
+    .programs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* Header */
+    .programs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .programs-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .programs-title i {
+        color: var(--primary-color);
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        min-width: 120px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    /* Action Header */
+    .action-header {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+
+    .btn-create-program {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.875rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-create-program:hover {
+        background: #4338ca;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+    }
+
+    /* Programs Grid */
+    .programs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .program-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .program-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+    }
+
+    .program-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .program-info {
+        flex: 1;
+    }
+
+    .program-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+
+    .program-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .program-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .status-ongoing {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-completed {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .program-date {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .program-description {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .program-objectives {
+        background: var(--bg-light);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .objectives-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .objectives-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .objectives-list li {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.25rem;
+        padding-left: 1rem;
+        position: relative;
+    }
+
+    .objectives-list li:before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: var(--primary-color);
+    }
+
+    .program-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-edit {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #4338ca;
+    }
+
+    .btn-view {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-view:hover {
+        background: var(--border-color);
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+        grid-column: 1 / -1;
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--border-color);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 3rem;
+        gap: 0.5rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .pagination-btn:hover:not(.disabled) {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .program-modal {
+        background: var(--bg-card);
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.25rem;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .form-check-label {
+        font-size: 0.875rem;
+        color: var(--text-primary);
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    .btn-modal {
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-modal-secondary {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-modal-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-modal-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .programs-container {
+            padding: 1rem;
+        }
+
+        .programs-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .header-stats {
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            min-width: calc(50% - 0.75rem);
+        }
+
+        .action-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .programs-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .program-header {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .program-meta {
+            flex-wrap: wrap;
+        }
+
+        .program-actions {
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="programs-container">
+    <!-- Header -->
+    <div class="programs-header">
+        <div>
+            <h1 class="programs-title">
+                <i class="fas fa-project-diagram"></i>
+                Program Management
+            </h1>
+            <p class="text-muted">Manage foundation programs and initiatives</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ total_programs }}</span>
+                <span class="stat-label">Total Programs</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ ongoing_programs }}</span>
+                <span class="stat-label">Ongoing</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ completed_programs }}</span>
+                <span class="stat-label">Completed</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Header -->
+    <div class="action-header">
+        <div class="search-box">
+            <input type="text" 
+                   class="search-input" 
+                   id="searchInput" 
+                   placeholder="Search programs by title or description..." 
+                   value="{{ search_query }}">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+        
+        <button class="btn-create-program" onclick="showCreateModal()">
+            <i class="fas fa-plus"></i> Create Program
+        </button>
+    </div>
+
+    <!-- Programs Grid -->
+    <div class="programs-grid">
+        {% for program in page_obj %}
+        <div class="program-card">
+            <div class="program-header">
+                <div class="program-info">
+                    <h3 class="program-title">{{ program.title }}</h3>
+                    <div class="program-meta">
+                        <span class="program-status {% if program.is_active %}status-ongoing{% else %}status-completed{% endif %}">
+                            {% if program.is_active %}
+                                <i class="fas fa-sync-alt"></i> Active
+                            {% else %}
+                                <i class="fas fa-check-circle"></i> Inactive
+                            {% endif %}
+                        </span>
+                        <span class="program-date">
+                            <i class="far fa-calendar"></i> {{ program.created_at|date:"M d, Y" }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="program-description">
+                {{ program.description|truncatechars:150 }}
+            </div>
+            
+            {% if program.objectives %}
+            <div class="program-objectives">
+                <div class="objectives-title">Key Objectives:</div>
+                <ul class="objectives-list">
+                    {% for objective in program.get_objectives_list %}
+                        <li>{{ objective|truncatechars:50 }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="program-actions">
+                <button class="btn-action btn-edit" onclick="showEditModal({{ program.id }})">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-action btn-view" onclick="viewProgram({{ program.id }})">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn-action btn-delete" onclick="showDeleteModal({{ program.id }})">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <h3>No Programs Found</h3>
+            <p>Create your first program to get started</p>
+            <button class="btn-create-program" onclick="showCreateModal()" style="margin-top: 1rem;">
+                <i class="fas fa-plus"></i> Create Program
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        {% if page_obj.has_previous %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.previous_page_number }})">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="pagination-btn active">{{ num }}</button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button class="pagination-btn" onclick="goToPage({{ num }})">{{ num }}</button>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.next_page_number }})">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Create/Edit Program Modal -->
+<div class="modal-overlay" id="programModal">
+    <div class="program-modal">
+        <div class="modal-header">
+            <h4 class="modal-title" id="modalTitle">Create Program</h4>
+            <button class="close-modal" onclick="closeProgramModal()">&times;</button>
+        </div>
+        <form id="programForm" enctype="multipart/form-data">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="programTitle" class="form-label">Program Title</label>
+                    <input type="text"
+                           class="form-input"
+                           id="programTitle"
+                           name="title"
+                           required
+                           placeholder="Enter program title">
+                </div>
+
+                <div class="form-group">
+                    <label for="programCategory" class="form-label">Category</label>
+                    <select class="form-input"
+                            id="programCategory"
+                            name="category"
+                            required>
+                        <option value="">Select a category</option>
+                        <option value="education">Education & Awareness</option>
+                        <option value="mentorship">Mentorship</option>
+                        <option value="rehabilitation">Rehabilitation</option>
+                        <option value="career">Career Building</option>
+                        <option value="women">Women Empowerment</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="programImage" class="form-label">Program Image</label>
+                    <input type="file"
+                           class="form-input"
+                           id="programImage"
+                           name="image"
+                           accept="image/*">
+                    <small class="text-muted">Upload a program image (optional)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="programDescription" class="form-label">Description</label>
+                    <textarea class="form-textarea"
+                              id="programDescription"
+                              name="description"
+                              rows="4"
+                              required
+                              placeholder="Describe the program's purpose and goals"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="programObjectives" class="form-label">Objectives (One per line)</label>
+                    <textarea class="form-textarea"
+                              id="programObjectives"
+                              name="objectives"
+                              rows="3"
+                              placeholder="Enter key objectives, one per line"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="programTargetAudience" class="form-label">Target Audience</label>
+                    <textarea class="form-textarea"
+                              id="programTargetAudience"
+                              name="target_audience"
+                              rows="2"
+                              placeholder="Describe the target audience for this program"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="programDuration" class="form-label">Duration</label>
+                    <input type="text"
+                           class="form-input"
+                           id="programDuration"
+                           name="duration"
+                           placeholder="e.g., 6 months, 1 year, Ongoing">
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="programActive"
+                               name="is_active">
+                        <label class="form-check-label" for="programActive">
+                            Mark as active
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal btn-modal-secondary" onclick="closeProgramModal()">Cancel</button>
+                <button type="submit" class="btn-modal btn-modal-primary" id="modalSubmitBtn">Create Program</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Program Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="program-modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h4 class="modal-title">Delete Program</h4>
+            <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this program?</p>
+            <p class="text-muted">This action cannot be undone. All associated data will be removed.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-modal-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn-modal btn-modal-danger" onclick="deleteProgram()">Delete Program</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentProgramId = null;
+    let isEditing = false;
+
+    // Modal Functions
+    function showCreateModal() {
+        isEditing = false;
+        currentProgramId = null;
+        document.getElementById('modalTitle').textContent = 'Create Program';
+        document.getElementById('modalSubmitBtn').textContent = 'Create Program';
+        document.getElementById('programForm').reset();
+        document.getElementById('programModal').style.display = 'flex';
+    }
+
+    function showEditModal(programId) {
+        isEditing = true;
+        currentProgramId = programId;
+        document.getElementById('modalTitle').textContent = 'Edit Program';
+        document.getElementById('modalSubmitBtn').textContent = 'Update Program';
+
+        fetch(`/staff/programs/${programId}/get/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('programTitle').value = data.title;
+                document.getElementById('programCategory').value = data.category;
+                document.getElementById('programDescription').value = data.description;
+                document.getElementById('programObjectives').value = data.objectives;
+                document.getElementById('programTargetAudience').value = data.target_audience;
+                document.getElementById('programDuration').value = data.duration;
+                document.getElementById('programActive').checked = data.is_active;
+
+                document.getElementById('programModal').style.display = 'flex';
+            });
+    }
+
+    function closeProgramModal() {
+        document.getElementById('programModal').style.display = 'none';
+    }
+
+    function viewProgram(programId) {
+        // In a real app, this would navigate to program details page
+        window.location.href = `/programs/${programId}/`;
+    }
+
+    // Delete Modal Functions
+    function showDeleteModal(programId) {
+        currentProgramId = programId;
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const query = this.value;
+            const url = new URL(window.location);
+            
+            if (query) {
+                url.searchParams.set('search', query);
+            } else {
+                url.searchParams.delete('search');
+            }
+            url.searchParams.set('page', '1');
+            window.location.href = url.toString();
+        }
+    });
+
+    // Pagination
+    function goToPage(page) {
+        const url = new URL(window.location);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+
+    // Form Submission
+    document.getElementById('programForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const url = isEditing ? `/staff/programs/${currentProgramId}/edit/` : '/staff/programs/create/';
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    });
+
+    // Delete Program
+    function deleteProgram() {
+        fetch(`/staff/programs/${currentProgramId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+
+    // Utility function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import WebsiteSetting, CoreValue, BoardMember, ExecutiveCommittee
+from .models import WebsiteSetting, CoreValue, BoardMember, ExecutiveCommittee, ContactMessage
 
 # Custom actions
 @admin.action(description='Activate selected items')
@@ -62,6 +62,26 @@ class BoardMemberAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" width="50" height="50" style="object-fit:cover;" />', obj.photo.url)
         return "No Photo"
     photo_preview.short_description = 'Photo'
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'subject', 'created_at', 'is_seen', 'resolved')
+    list_filter = ('is_seen', 'resolved', 'created_at')
+    search_fields = ('name', 'email', 'subject', 'message')
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at',)
+
+    fieldsets = (
+        ('Contact Information', {
+            'fields': ('name', 'email', 'phone')
+        }),
+        ('Message Details', {
+            'fields': ('subject', 'message')
+        }),
+        ('Status', {
+            'fields': ('is_seen', 'resolved', 'created_at')
+        }),
+    )
 
 @admin.register(ExecutiveCommittee)
 class ExecutiveCommitteeAdmin(admin.ModelAdmin):

@@ -1,0 +1,1461 @@
+{% extends 'staff_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Staff Dashboard | Admin Panel{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff-dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Modern Header -->
+    <header class="dashboard-header">
+        <div class="header-main">
+            <div class="welcome-section">
+                <h1 class="greeting">Welcome back, <span class="user-name">{{ user.get_full_name|default:user.username }}</span>!</h1>
+                <p class="subtitle">Dashboard overview and analytics</p>
+            </div>
+            <div class="header-controls">
+                <div class="control-group">
+                    <button class="btn-control" id="notificationsBtn">
+                        <i class="fas fa-bell"></i>
+                        {% if unresolved_messages > 0 %}
+                        <span class="badge">{{ unresolved_messages }}</span>
+                        {% endif %}
+                    </button>
+                    <button class="btn-control" id="exportBtn" title="Export Data">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                    <div class="theme-switch">
+                        <input type="checkbox" id="darkModeToggle" hidden>
+                        <label for="darkModeToggle" class="theme-toggle">
+                            <i class="fas fa-sun"></i>
+                            <i class="fas fa-moon"></i>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-role">Staff Admin</span>
+                        <span class="user-name">{{ user.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="date-display">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="currentDate">{{ current_date|date:"F d, Y" }}</span>
+        </div>
+    </header>
+
+    <!-- Stats Grid - Modern Cards -->
+    <div class="stats-container">
+        <div class="stats-grid">
+            <!-- Total Users Card -->
+            <div class="stat-card card-gradient-blue">
+                <div class="card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="stat-value">{{ total_users }}</h3>
+                    <p class="stat-label">Total Users</p>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up trend-up"></i>
+                        <span>+12% this month</span>
+                    </div>
+                </div>
+                <a href="{% url 'staff_dashboard:manage_users' %}" class="card-link">
+                    View details <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Donations Card -->
+            <div class="stat-card card-gradient-green">
+                <div class="card-icon">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="stat-value">${{ total_donation_amount|floatformat:0 }}</h3>
+                    <p class="stat-label">Total Donated</p>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up trend-up"></i>
+                        <span>+{{ total_donations }} donations</span>
+                    </div>
+                </div>
+                <a href="{% url 'staff_dashboard:manage_donations' %}" class="card-link">
+                    View details <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Active Programs Card -->
+            <div class="stat-card card-gradient-purple">
+                <div class="card-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="card-content">
+                    <h3 class="stat-value">{{ total_programs }}</h3>
+                    <p class="stat-label">Active Programs</p>
+                    <div class="stat-trend">
+                        <i class="fas fa-check-circle"></i>
+                        <span>All operational</span>
+                    </div>
+                </div>
+                <a href="{% url 'staff_dashboard:manage_programs' %}" class="card-link">
+                    View details <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Messages Card with Badge -->
+            <div class="stat-card card-gradient-orange">
+                <div class="card-icon">
+                    <i class="fas fa-envelope"></i>
+                    {% if unresolved_messages > 0 %}
+                    <span class="notification-badge pulse">{{ unresolved_messages }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-content">
+                    <h3 class="stat-value">{{ unresolved_messages }}</h3>
+                    <p class="stat-label">Pending Messages</p>
+                    <div class="stat-trend">
+                        <i class="fas fa-clock"></i>
+                        <span>Requires attention</span>
+                    </div>
+                </div>
+                <a href="{% url 'staff_dashboard:manage_contact_messages' %}" class="card-link">
+                    View details <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="content-grid">
+        <!-- Left Column -->
+        <div class="content-left">
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <!-- Donation Trends Chart -->
+                <div class="chart-container card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> Donation Trends</h3>
+                        <div class="chart-controls">
+                            <button class="btn-period active" data-period="7d">7 Days</button>
+                            <button class="btn-period" data-period="30d">30 Days</button>
+                            <button class="btn-period" data-period="90d">90 Days</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="donationChart"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <div class="chart-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">Total This Week</span>
+                                <span class="summary-value">${{ weekly_total|default:"0" }}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Avg Daily</span>
+                                <span class="summary-value">${{ daily_avg|default:"0" }}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Growth</span>
+                                <span class="summary-value trend-up">+{{ growth_rate|default:"0" }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Registration Trends Chart -->
+                <div class="chart-container card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-plus"></i> User Registrations</h3>
+                        <div class="chart-controls">
+                            <button class="btn-period active" data-period="30d">30 Days</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="userChart"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <div class="chart-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">Total This Month</span>
+                                <span class="summary-value">{{ total_users_month }}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Avg Daily</span>
+                                <span class="summary-value">{{ avg_daily_users|floatformat:"1" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Distribution Chart -->
+                <div class="chart-container card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-credit-card"></i> Payment Methods</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <div class="chart-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">Total Donations</span>
+                                <span class="summary-value">{{ total_donations }}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Methods Used</span>
+                                <span class="summary-value">{{ payment_labels|length }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Currency Donation Breakdown Chart -->
+                <div class="chart-container card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Currency Breakdown</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="programChart"></canvas>
+                    </div>
+                    <div class="card-footer">
+                        <div class="chart-summary">
+                            <div class="summary-item">
+                                <span class="summary-label">Top Currency</span>
+                                <span class="summary-value">{{ program_labels.0|default:"N/A"|truncatechars:15 }}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Currencies</span>
+                                <span class="summary-value">{{ program_labels|length }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats-grid">
+                <div class="quick-stat">
+                    <div class="quick-stat-icon" style="background: #e3f2fd;">
+                        <i class="fas fa-star" style="color: #1976d2;"></i>
+                    </div>
+                    <div class="quick-stat-content">
+                        <h4>{{ total_testimonials }}</h4>
+                        <p>Testimonials</p>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <div class="quick-stat-icon" style="background: #f3e5f5;">
+                        <i class="fas fa-database" style="color: #7b1fa2;"></i>
+                    </div>
+                    <div class="quick-stat-content">
+                        <h4>{{ backup_count|default:"0" }}</h4>
+                        <p>Backups</p>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <div class="quick-stat-icon" style="background: #e8f5e8;">
+                        <i class="fas fa-check-circle" style="color: #2e7d32;"></i>
+                    </div>
+                    <div class="quick-stat-content">
+                        <h4>{{ active_users|default:"0" }}</h4>
+                        <p>Active Today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="content-right">
+            <!-- Recent Activity -->
+            <div class="activity-container card">
+                <div class="card-header">
+                    <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="activity-timeline">
+                        {% for donation in recent_donations %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker donation"></div>
+                            <div class="timeline-content">
+                                <div class="activity-header">
+                                    <h4 class="activity-title">{{ donation.donor.get_full_name|default:donation.donor.username }}</h4>
+                                    <span class="activity-time">{{ donation.created_at|timesince }} ago</span>
+                                </div>
+                                <p class="activity-description">Donated <strong>${{ donation.amount }}</strong> to {{ donation.program.name|default:"General Fund" }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        {% for user in recent_users %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker user"></div>
+                            <div class="timeline-content">
+                                <div class="activity-header">
+                                    <h4 class="activity-title">New Registration</h4>
+                                    <span class="activity-time">{{ user.date_joined|timesince }} ago</span>
+                                </div>
+                                <p class="activity-description">{{ user.get_full_name|default:user.username }} joined the platform</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        {% for message in recent_messages %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker message"></div>
+                            <div class="timeline-content">
+                                <div class="activity-header">
+                                    <h4 class="activity-title">{{ message.name }}</h4>
+                                    <span class="activity-time">{{ message.created_at|timesince }} ago</span>
+                                </div>
+                                <p class="activity-description">Sent a message: "{{ message.message|truncatechars:50 }}"</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions card">
+                <div class="card-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="action-grid">
+                        <a href="{% url 'staff_dashboard:manage_users' %}" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-user-cog"></i>
+                            </div>
+                            <span>Manage Users</span>
+                        </a>
+                        <a href="{% url 'staff_dashboard:manage_donations' %}" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-donate"></i>
+                            </div>
+                            <span>Manage Donations</span>
+                        </a>
+                        <a href="{% url 'staff_dashboard:manage_programs' %}" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <span>Manage Programs</span>
+                        </a>
+                        <a href="{% url 'staff_dashboard:manage_testimonials' %}" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-comment-alt"></i>
+                            </div>
+                            <span>Testimonials</span>
+                        </a>
+                        <a href="{% url 'staff_dashboard:manage_contact_messages' %}" class="action-btn highlight">
+                            <div class="action-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <span>Messages {% if unresolved_messages > 0 %}<span class="action-badge">{{ unresolved_messages }}</span>{% endif %}</span>
+                        </a>
+                        <a href="{% url 'staff_dashboard:manage_backups' %}" class="action-btn">
+                            <div class="action-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <span>Backups</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Chart
+    const ctx = document.getElementById('donationChart').getContext('2d');
+    const donationChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Donations ($)',
+                data: {{ chart_data|safe }},
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.05)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#4f46e5',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 6,
+                    displayColors: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.03)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.03)'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            animations: {
+                tension: {
+                    duration: 1000,
+                    easing: 'linear'
+                }
+            }
+        }
+    });
+
+    // User Registration Chart
+    const userCtx = document.getElementById('userChart').getContext('2d');
+    const userChart = new Chart(userCtx, {
+        type: 'line',
+        data: {
+            labels: {{ user_chart_labels|safe }},
+            datasets: [{
+                label: 'New Users',
+                data: {{ user_chart_data|safe }},
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#10b981',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 6,
+                    displayColors: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.03)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.03)'
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            animations: {
+                tension: {
+                    duration: 1000,
+                    easing: 'linear'
+                }
+            }
+        }
+    });
+
+    // Payment Method Distribution Chart
+    const paymentCtx = document.getElementById('paymentChart').getContext('2d');
+    const paymentChart = new Chart(paymentCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ payment_labels|safe }},
+            datasets: [{
+                data: {{ payment_data|safe }},
+                backgroundColor: {{ payment_colors|safe }},
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 6,
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animations: {
+                animateScale: true,
+                animateRotate: true
+            }
+        }
+    });
+
+    // Program Donation Breakdown Chart
+    const programCtx = document.getElementById('programChart').getContext('2d');
+    const programChart = new Chart(programCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ program_labels|safe }},
+            datasets: [{
+                label: 'Donations ($)',
+                data: {{ program_data|safe }},
+                backgroundColor: 'rgba(139, 92, 246, 0.8)',
+                borderColor: '#8b5cf6',
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 6,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return '$' + context.parsed.y.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.03)'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0,0,0,0.03)'
+                    },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            animations: {
+                y: {
+                    duration: 1000,
+                    easing: 'easeOutBounce'
+                }
+            }
+        }
+    });
+
+    // Chart Period Controls
+    document.querySelectorAll('.btn-period').forEach(button => {
+        button.addEventListener('click', function() {
+            document.querySelectorAll('.btn-period').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            // In a real app, you would fetch new data based on the selected period
+            alert('Period changed to ' + this.dataset.period);
+        });
+    });
+
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('change', function() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', this.checked);
+        
+        // Update chart colors for dark mode
+        if (this.checked) {
+            donationChart.options.scales.x.grid.color = 'rgba(255,255,255,0.05)';
+            donationChart.options.scales.y.grid.color = 'rgba(255,255,255,0.05)';
+        } else {
+            donationChart.options.scales.x.grid.color = 'rgba(0,0,0,0.03)';
+            donationChart.options.scales.y.grid.color = 'rgba(0,0,0,0.03)';
+        }
+        donationChart.update();
+    });
+
+    // Load dark mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        darkModeToggle.checked = true;
+        document.body.classList.add('dark-mode');
+    }
+
+    // Export Functionality
+    document.getElementById('exportBtn').addEventListener('click', function() {
+        // Show export options modal
+        const exportOptions = [
+            { format: 'CSV', icon: 'fa-file-csv' },
+            { format: 'PDF', icon: 'fa-file-pdf' },
+            { format: 'Excel', icon: 'fa-file-excel' }
+        ];
+        
+        let exportModal = `
+            <div class="export-modal">
+                <div class="modal-header">
+                    <h4>Export Data</h4>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    ${exportOptions.map(option => `
+                        <button class="export-option" data-format="${option.format.toLowerCase()}">
+                            <i class="fas ${option.icon}"></i>
+                            Export as ${option.format}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        const modalContainer = document.createElement('div');
+        modalContainer.className = 'modal-overlay';
+        modalContainer.innerHTML = exportModal;
+        document.body.appendChild(modalContainer);
+        
+        // Add event listeners
+        modalContainer.querySelector('.close-modal').addEventListener('click', () => {
+            document.body.removeChild(modalContainer);
+        });
+        
+        modalContainer.querySelectorAll('.export-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const format = this.dataset.format;
+                alert(`Exporting data as ${format.toUpperCase()}...`);
+                document.body.removeChild(modalContainer);
+            });
+        });
+        
+        // Close on overlay click
+        modalContainer.addEventListener('click', (e) => {
+            if (e.target === modalContainer) {
+                document.body.removeChild(modalContainer);
+            }
+        });
+    });
+
+    // Update current date
+    const currentDate = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('currentDate').textContent = currentDate.toLocaleDateString('en-US', options);
+});
+</script>
+
+<style>
+/* Base Variables */
+:root {
+    --primary-color: #4f46e5;
+    --secondary-color: #7c3aed;
+    --accent-color: #f59e0b;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+    --bg-light: #f8fafc;
+    --bg-card: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+}
+
+.dark-mode {
+    --bg-light: #0f172a;
+    --bg-card: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --border-color: #334155;
+}
+
+/* Dashboard Styles */
+.dashboard-container {
+    min-height: 100vh;
+    background: var(--bg-light);
+    transition: background 0.3s ease;
+}
+
+/* Header Styles */
+.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.welcome-section .greeting {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.welcome-section .user-name {
+    color: var(--accent-color);
+}
+
+.subtitle {
+    opacity: 0.9;
+    font-size: 0.875rem;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.control-group {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.btn-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.btn-control:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.btn-control .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--danger-color);
+    color: white;
+    font-size: 0.75rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+}
+
+.theme-toggle i {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    z-index: 1;
+}
+
+.theme-toggle .fa-sun {
+    left: 8px;
+    color: var(--accent-color);
+}
+
+.theme-toggle .fa-moon {
+    right: 8px;
+    color: #94a3b8;
+}
+
+.toggle-slider {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+#darkModeToggle:checked + .theme-toggle .toggle-slider {
+    transform: translateX(30px);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.avatar {
+    font-size: 1.5rem;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.user-name {
+    font-weight: 600;
+}
+
+.date-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+/* Stats Grid */
+.stats-container {
+    padding: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-gradient-blue {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+}
+
+.card-gradient-green {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: white;
+}
+
+.card-gradient-purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.card-gradient-orange {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+.card-icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 2.5rem;
+    opacity: 0.2;
+}
+
+.card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.stat-trend {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.trend-up {
+    color: #86efac;
+}
+
+.card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.9;
+    font-size: 0.875rem;
+    transition: opacity 0.2s ease;
+}
+
+.card-link:hover {
+    opacity: 1;
+}
+
+.notification-badge.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    padding: 0 2rem 2rem;
+}
+
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0,0,0,0.02);
+}
+
+.dark-mode .card-footer {
+    background: rgba(255,255,255,0.02);
+}
+
+/* Charts Grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Chart Container */
+.chart-container {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.chart-container:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.chart-container canvas {
+    max-height: 300px;
+}
+
+/* Chart Controls */
+.chart-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-period {
+    padding: 0.375rem 0.75rem;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-period.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.btn-period:hover:not(.active) {
+    background: var(--border-color);
+}
+
+/* Quick Stats */
+.quick-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.quick-stat {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.quick-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.quick-stat-content h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.quick-stat-content p {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    position: relative;
+}
+
+.timeline-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    position: relative;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 48px;
+    bottom: -1rem;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.timeline-marker {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+.timeline-marker.donation {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+}
+
+.timeline-marker.user {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info-color);
+}
+
+.timeline-marker.message {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.25rem;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.activity-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Quick Actions */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 0.5rem;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.action-btn.highlight {
+    border-color: var(--accent-color);
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+}
+
+.action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.action-btn.highlight .action-icon {
+    background: var(--accent-color);
+}
+
+.action-btn span {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.action-badge {
+    background: var(--danger-color);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    border-radius: 1rem;
+    margin-left: 0.25rem;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.export-modal {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    line-height: 1;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.export-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.75rem;
+}
+
+.export-option:last-child {
+    margin-bottom: 0;
+}
+
+.export-option:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Summary Styles */
+.chart-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.summary-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-main {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .header-controls {
+        justify-content: space-between;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .content-grid {
+        padding: 0 1rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-header {
+        padding: 1rem;
+    }
+    
+    .stats-container {
+        padding: 1rem;
+    }
+}
+</style>
+{% endblock %}

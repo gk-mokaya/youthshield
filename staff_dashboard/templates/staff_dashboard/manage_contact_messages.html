@@ -1,0 +1,1034 @@
+{% extends 'staff_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Contact Messages | Staff Dashboard{% endblock %}
+
+{% load tz %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff-dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #4f46e5;
+        --secondary-color: #7c3aed;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --bg-light: #f8fafc;
+        --bg-card: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    .dark-mode {
+        --bg-light: #0f172a;
+        --bg-card: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-color: #334155;
+    }
+
+    .messages-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* Header */
+    .messages-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .messages-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .messages-title i {
+        color: var(--primary-color);
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    /* Search Bar */
+    .search-container {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-box {
+        position: relative;
+        max-width: 400px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+    }
+
+    /* Messages Grid */
+    .messages-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .message-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .message-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .message-card.unread {
+        background: linear-gradient(90deg, rgba(79, 70, 229, 0.05) 0%, transparent 100%);
+        border-left: 4px solid var(--primary-color);
+    }
+
+    .message-card.resolved {
+        opacity: 0.8;
+    }
+
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .message-sender {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .sender-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .sender-info h4 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .sender-email {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    .message-status {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .status-unresolved {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-resolved {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .message-time {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .message-subject {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.125rem;
+    }
+
+    .message-content {
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .message-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .btn-view {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #4338ca;
+    }
+
+    .btn-reply {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-reply:hover {
+        background: var(--border-color);
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: var(--danger-color);
+        border: 1px solid var(--danger-color);
+    }
+
+    .btn-delete:hover {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--border-color);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        gap: 0.5rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .pagination-btn:hover:not(.disabled) {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .message-modal {
+        background: var(--bg-card);
+        border-radius: 1rem;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.25rem;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .message-details {
+        background: var(--bg-light);
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-row {
+        display: flex;
+        margin-bottom: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .detail-label {
+        min-width: 100px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .detail-value {
+        color: var(--text-primary);
+        flex: 1;
+    }
+
+    .message-text {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        color: var(--text-primary);
+    }
+
+    .modal-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .status-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--border-color);
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+        background: var(--success-color);
+    }
+
+    input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-modal {
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-modal-secondary {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-modal-danger {
+        background: var(--danger-color);
+        color: white;
+    }
+
+    .btn-modal-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-modal-primary:hover {
+        background: #4338ca;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .form-textarea {
+        width: 100%;
+        padding: 0.875rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        resize: vertical;
+        min-height: 120px;
+        transition: all 0.3s ease;
+    }
+
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .messages-container {
+            padding: 1rem;
+        }
+
+        .messages-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .header-stats {
+            justify-content: space-between;
+        }
+
+        .message-header {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .message-status {
+            align-self: flex-start;
+        }
+
+        .modal-footer {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .status-toggle {
+            align-self: flex-start;
+        }
+
+        .modal-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="messages-container">
+    <!-- Header -->
+    <div class="messages-header">
+        <div>
+            <h1 class="messages-title">
+                <i class="fas fa-envelope"></i>
+                Contact Messages
+            </h1>
+            <p class="text-muted">Manage contact form submissions</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ total_messages }}</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ unresolved_messages }}</span>
+                <span class="stat-label">Unresolved</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ today_messages }}</span>
+                <span class="stat-label">Today</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" 
+                   class="search-input" 
+                   id="searchInput" 
+                   placeholder="Search messages by name, email, or subject..." 
+                   value="{{ search_query }}">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+    </div>
+
+    <!-- Messages Grid -->
+    <div class="messages-grid">
+        {% for message in page_obj %}
+        <div class="message-card {% if not message.resolved %}unread{% endif %} {% if message.resolved %}resolved{% endif %}" 
+             onclick="openMessageModal({{ message.id }})">
+            <div class="message-header">
+                <div class="message-sender">
+                    <div class="sender-avatar">
+                        {{ message.name|first|upper }}
+                    </div>
+                    <div class="sender-info">
+                        <h4>{{ message.name }}</h4>
+                        <div class="sender-email">{{ message.email }}</div>
+                    </div>
+                </div>
+                <div class="message-status">
+                    {% if not message.resolved %}
+                    <span class="status-badge status-unresolved">
+                        <i class="fas fa-clock"></i> Unresolved
+                    </span>
+                    {% else %}
+                    <span class="status-badge status-resolved">
+                        <i class="fas fa-check-circle"></i> Resolved
+                    </span>
+                    {% endif %}
+                    <span class="message-time">
+                        <i class="far fa-clock"></i> {{ message.formatted_time }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="message-subject">{{ message.subject }}</div>
+            
+            <div class="message-content">{{ message.message|truncatechars:200 }}</div>
+            
+            <div class="message-actions">
+                <button class="btn-action btn-view" onclick="openMessageModal({{ message.id }}); event.stopPropagation();">
+                    <i class="fas fa-eye"></i> View
+                </button>
+                <button class="btn-action btn-reply" onclick="replyToMessage({{ message.id }}); event.stopPropagation();">
+                    <i class="fas fa-reply"></i> Reply
+                </button>
+                <button class="btn-action btn-delete disabled" onclick="event.stopPropagation();" disabled>
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-envelope-open"></i>
+            </div>
+            <h3>No Messages Found</h3>
+            <p>No contact messages to display</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        {% if page_obj.has_previous %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.previous_page_number }})">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="pagination-btn active">{{ num }}</button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button class="pagination-btn" onclick="goToPage({{ num }})">{{ num }}</button>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.next_page_number }})">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Message View Modal -->
+<div class="modal-overlay" id="messageModal">
+    <div class="message-modal">
+        <div class="modal-header">
+            <h4 class="modal-title">Message Details</h4>
+            <button class="close-modal" onclick="closeMessageModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="message-details">
+                <div class="detail-row">
+                    <span class="detail-label">From:</span>
+                    <span class="detail-value" id="modalName"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value" id="modalEmail"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Subject:</span>
+                    <span class="detail-value" id="modalSubject"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value" id="modalDate"></span>
+                </div>
+            </div>
+            <div class="message-text" id="modalMessage"></div>
+        </div>
+        <div class="modal-footer">
+            <div class="status-toggle">
+                <span>Mark as resolved:</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="modalResolved" onchange="toggleResolved()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal btn-modal-secondary" onclick="closeMessageModal()">Close</button>
+                <button class="btn-modal btn-modal-primary" onclick="updateStatus()">Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="message-modal" style="max-width: 400px;">
+        <div class="modal-header">
+            <h4 class="modal-title">Delete Message</h4>
+            <button class="close-modal" onclick="closeDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this message? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-modal-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn-modal btn-modal-danger" onclick="deleteMessage()">Delete Message</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal -->
+<div class="modal-overlay" id="replyModal">
+    <div class="message-modal" style="max-width: 700px;">
+        <div class="modal-header">
+            <h4 class="modal-title">Reply to Message</h4>
+            <button class="close-modal" onclick="closeReplyModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="message-details">
+                <div class="detail-row">
+                    <span class="detail-label">From:</span>
+                    <span class="detail-value" id="replyName"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value" id="replyEmail"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value" id="replyPhone"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Subject:</span>
+                    <span class="detail-value" id="replySubject"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Original Message:</span>
+                    <div class="detail-value" id="replyOriginalMessage" style="white-space: pre-wrap; margin-top: 0.5rem;"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="replySubjectInput" class="form-label">Subject</label>
+                <input type="text" class="form-textarea" id="replySubjectInput" name="reply_subject" required placeholder="Enter reply subject..." style="height: auto; min-height: auto;">
+            </div>
+            <div class="form-group">
+                <label for="replyContent" class="form-label">Your Reply</label>
+                <textarea class="form-textarea" id="replyContent" name="reply_content" rows="8" required placeholder="Type your reply here..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-modal-secondary" onclick="closeReplyModal()">Cancel</button>
+            <button class="btn-modal btn-modal-primary" onclick="sendReply()">Send Reply</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentMessageId = null;
+
+    // Message Modal Functions
+    function openMessageModal(messageId) {
+        currentMessageId = messageId;
+
+        // Fetch message data
+        fetch(`/staff/contact-messages/${messageId}/get/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('modalName').textContent = data.name;
+                document.getElementById('modalEmail').textContent = data.email;
+                document.getElementById('modalSubject').textContent = data.subject;
+                document.getElementById('modalDate').textContent = new Date(data.created_at).toLocaleString();
+                document.getElementById('modalMessage').textContent = data.message;
+                document.getElementById('modalResolved').checked = data.resolved;
+
+                document.getElementById('messageModal').style.display = 'flex';
+            });
+    }
+
+    function closeMessageModal() {
+        document.getElementById('messageModal').style.display = 'none';
+    }
+
+    // Delete Modal Functions
+    function showDeleteModal(messageId) {
+        currentMessageId = messageId;
+        closeMessageModal();
+        document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    // Toggle resolved status
+    function toggleResolved() {
+        const resolved = document.getElementById('modalResolved').checked;
+
+        fetch(`/staff/update-message/${currentMessageId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ resolved: resolved })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reload page to reflect changes
+                setTimeout(() => location.reload(), 300);
+            }
+        });
+    }
+
+    // Update status
+    function updateStatus() {
+        const resolved = document.getElementById('modalResolved').checked;
+
+        fetch(`/staff/update-message/${currentMessageId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ resolved: resolved })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Status updated successfully!');
+                closeMessageModal();
+                // Reload page to reflect changes
+                setTimeout(() => location.reload(), 300);
+            } else {
+                alert('Failed to update status: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error updating status: ' + error.message);
+        });
+    }
+
+    // Delete message
+    function deleteMessage() {
+        fetch(`/staff/delete-message/${currentMessageId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+
+    // Reply to message
+    function replyToMessage(messageId) {
+        currentMessageId = messageId;
+        fetch(`/staff/contact-messages/${messageId}/get/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('replyName').textContent = data.name;
+                document.getElementById('replyEmail').textContent = data.email;
+                document.getElementById('replyPhone').textContent = data.phone;
+                document.getElementById('replySubject').textContent = data.subject;
+                document.getElementById('replyOriginalMessage').textContent = data.message;
+                document.getElementById('replySubjectInput').value = 'Re: ' + data.subject;
+                document.getElementById('replyContent').value = '';
+
+                document.getElementById('replyModal').style.display = 'flex';
+            });
+    }
+
+    function closeReplyModal() {
+        document.getElementById('replyModal').style.display = 'none';
+    }
+
+    function sendReply() {
+        const replySubject = document.getElementById('replySubjectInput').value.trim();
+        const replyContent = document.getElementById('replyContent').value.trim();
+        if (!replySubject || !replyContent) {
+            alert('Please enter both subject and reply message.');
+            return;
+        }
+
+        fetch(`/staff/contact-messages/${currentMessageId}/reply/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reply_subject: replySubject, reply_message: replyContent })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Reply sent successfully!');
+                closeReplyModal();
+                // Optionally mark as resolved
+                toggleResolved();
+            } else {
+                alert('Failed to send reply: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            alert('Error sending reply: ' + error.message);
+        });
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const query = this.value;
+            const url = new URL(window.location);
+            
+            if (query) {
+                url.searchParams.set('search', query);
+            } else {
+                url.searchParams.delete('search');
+            }
+            url.searchParams.set('page', '1');
+            window.location.href = url.toString();
+        }
+    });
+
+    // Pagination
+    function goToPage(page) {
+        const url = new URL(window.location);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
+    });
+
+    // Utility function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

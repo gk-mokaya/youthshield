@@ -52,6 +52,10 @@ def user_login(request):
             request.session['tab_token'] = tab_token
             messages.success(request, f'Welcome back, {user.username}!')
             return redirect('users:redirect_based_on_role')
+        # Inactive user handling
+        elif CustomUser.objects.filter(username=username, is_active=False).exists():
+            messages.error(request, 'Your account is inactive. Please contact support.')
+            
         else:
             messages.error(request, 'Invalid username or password.')
 
