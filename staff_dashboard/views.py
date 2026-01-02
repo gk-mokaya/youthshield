@@ -841,16 +841,25 @@ def delete_contact_message(request, message_id):
 def create_backup(request):
     if request.method == 'POST':
         try:
+            import sqlite3
+
             backup_dir = os.path.join(settings.BASE_DIR, 'backups')
             if not os.path.exists(backup_dir):
                 os.makedirs(backup_dir)
 
-            db_path = settings.DATABASES['default']['NAME']
+            db_path = str(settings.DATABASES['default']['NAME'])
             backup_name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.bak"
             backup_path = os.path.join(backup_dir, backup_name)
 
-            # Create backup with metadata
-            shutil.copy2(db_path, backup_path)
+            # Create SQLite backup using proper method
+            conn = sqlite3.connect(db_path)
+            backup_conn = sqlite3.connect(backup_path)
+
+            with backup_conn:
+                conn.backup(backup_conn)
+
+            conn.close()
+            backup_conn.close()
 
             # Log backup creation
             import logging
