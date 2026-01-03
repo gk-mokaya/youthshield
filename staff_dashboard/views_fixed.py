@@ -10,13 +10,12 @@ from donations.models import Donation
 from programs.models import Program
 from testimonials.models import Testimonial
 from core.models import ContactMessage, WebsiteSetting
-from staff_dashboard.models import BackupJob, BackupLog, AuditLog
+from staff_dashboard.models import BackupJob, BackupLog
 import os
 import shutil
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.conf import settings
 from django.core.mail import send_mail
-from django.utils import timezone
 
 def is_staff(user):
     return user.is_staff or user.is_superuser
@@ -160,7 +159,7 @@ def dashboard(request):
     allowed_methods = ['mpesa', 'paypal', 'card']
 
     # Recent activities - separated
-    recent_donations = Donation.objects.select_related('donor').filter(donor__isnull=False).order_by('-created_at')[:5]
+    recent_donations = Donation.objects.select_related('donor').order_by('-created_at')[:5]
     recent_users = CustomUser.objects.order_by('-date_joined')[:5]
     recent_messages = ContactMessage.objects.order_by('-created_at')[:5]
 
@@ -306,7 +305,6 @@ def dashboard(request):
         program_data.append(float(donation['total']))
 
     context = {
-        'user': request.user,
         'total_users': total_users,
         'total_donations': total_donations,
         'total_donation_amount': total_donation_amount,
@@ -976,19 +974,6 @@ def reject_testimonial(request, testimonial_id):
 
 @login_required
 @user_passes_test(is_staff)
-def unapprove_testimonial(request, testimonial_id):
-    testimonial = get_object_or_404(Testimonial, id=testimonial_id)
-    if request.method == 'POST':
-        testimonial.status = 'pending'
-        testimonial.reviewed_by = request.user
-        testimonial.reviewed_at = timezone.now()
-        testimonial.save()
-        messages.success(request, 'Testimonial unapproved successfully.')
-        return JsonResponse({'success': True})
-    return JsonResponse({'success': False})
-
-@login_required
-@user_passes_test(is_staff)
 def delete_testimonial(request, testimonial_id):
     testimonial = get_object_or_404(Testimonial, id=testimonial_id)
     if request.method == 'POST':
@@ -1046,24 +1031,9 @@ def reply_contact_message(request, message_id):
 def edit_contact_message(request, message_id):
     message = get_object_or_404(ContactMessage, id=message_id)
     if request.method == 'POST':
-        import json
-        try:
-            data = json.loads(request.body)
-            resolved = data.get('resolved', False)
-            message.resolved = resolved
-            message.save()
-            if resolved:
-                messages.success(request, 'Message marked as resolved successfully.')
-            else:
-                messages.success(request, 'Message marked as unresolved successfully.')
-            return JsonResponse({'success': True})
-        except json.JSONDecodeError:
-            messages.error(request, 'Invalid data received.')
-            return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
-        except Exception as e:
-            messages.error(request, f'Failed to update message status: {str(e)}')
-            return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False})
+        # Handle message editing
+        pass
+    return JsonResponse({'success': True})
 
 @login_required
 @user_passes_test(is_staff)
@@ -1202,134 +1172,4 @@ def save_auto_backup_settings(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False})
-
-@login_required
-@user_passes_test(is_staff)
-def manage_website_settings(request):
-    # Get or create the website settings (assuming single instance)
-    settings, created = WebsiteSetting.objects.get_or_create(
-        defaults={'name': 'Youth Shield Foundation'}
-    )
-
-    if request.method == 'POST':
-        # Handle form submission
-        settings.name = request.POST.get('name', settings.name)
-        settings.Registration_Number = request.POST.get('Registration_Number', settings.Registration_Number)
-        settings.mission = request.POST.get('mission', settings.mission)
-        settings.vision = request.POST.get('vision', settings.vision)
-        settings.contact_email = request.POST.get('contact_email', settings.contact_email)
-        settings.contact_phone = request.POST.get('contact_phone', settings.contact_phone)
-        settings.address = request.POST.get('address', settings.address)
-        settings.primary_color = request.POST.get('primary_color', settings.primary_color)
-        settings.secondary_color = request.POST.get('secondary_color', settings.secondary_color)
-        settings.accent_color = request.POST.get('accent_color', settings.accent_color)
-        settings.facebook_url = request.POST.get('facebook_url', settings.facebook_url)
-        settings.twitter_url = request.POST.get('twitter_url', settings.twitter_url)
-        settings.instagram_url = request.POST.get('instagram_url', settings.instagram_url)
-        settings.linkedin_url = request.POST.get('linkedin_url', settings.linkedin_url)
-        settings.tiktok_url = request.POST.get('tiktok_url', settings.tiktok_url)
-        settings.whatsapp_channel_url = request.POST.get('whatsapp_channel_url', settings.whatsapp_channel_url)
-        settings.website_url = request.POST.get('website_url', settings.website_url)
-        settings.emergency_phone = request.POST.get('emergency_phone', settings.emergency_phone)
-        settings.support_email = request.POST.get('support_email', settings.support_email)
-        settings.tagline = request.POST.get('tagline', settings.tagline)
-        settings.copyright_text = request.POST.get('copyright_text', settings.copyright_text)
-        settings.description = request.POST.get('description', settings.description)
-
-        # SEO Settings
-        settings.meta_title = request.POST.get('meta_title', settings.meta_title)
-        settings.meta_description = request.POST.get('meta_description', settings.meta_description)
-        settings.meta_keywords = request.POST.get('meta_keywords', settings.meta_keywords)
-        settings.google_analytics_id = request.POST.get('google_analytics_id', settings.google_analytics_id)
-
-        # Additional Settings
-        settings.default_language = request.POST.get('default_language', settings.default_language)
-        settings.timezone = request.POST.get('timezone', settings.timezone)
-        settings.working_hours = request.POST.get('working_hours', settings.working_hours)
-        settings.privacy_policy_url = request.POST.get('privacy_policy_url', settings.privacy_policy_url)
-        settings.terms_of_service_url = request.POST.get('terms_of_service_url', settings.terms_of_service_url)
-        settings.footer_text = request.POST.get('footer_text', settings.footer_text)
-        settings.maintenance_mode = request.POST.get('maintenance_mode') == 'on'
-
-        # Handle logo upload
-        if request.FILES.get('logo'):
-            settings.logo = request.FILES['logo']
-
-        try:
-            settings.save()
-            messages.success(request, 'Website settings updated successfully.')
-        except Exception as e:
-            messages.error(request, f'Error updating settings: {str(e)}')
-
-        return redirect('staff_dashboard:manage_website_settings')
-
-    context = {
-        'settings': settings,
-    }
-    return render(request, 'staff_dashboard/manage_website_settings.html', context)
-
-@login_required
-@user_passes_test(is_staff)
-def manage_audit_logs(request):
-    # Get filter parameters
-    search_query = request.GET.get('search', '')
-    action_filter = request.GET.get('action', '')
-    user_filter = request.GET.get('user', '')
-    date_from = request.GET.get('date_from', '')
-    date_to = request.GET.get('date_to', '')
-
-    # Base queryset
-    audit_logs = AuditLog.objects.select_related('user').order_by('-timestamp')
-
-    # Apply search filter
-    if search_query:
-        audit_logs = audit_logs.filter(
-            Q(message__icontains=search_query) |
-            Q(model_name__icontains=search_query) |
-            Q(object_id__icontains=search_query)
-        )
-
-    # Apply action filter
-    if action_filter:
-        audit_logs = audit_logs.filter(action=action_filter)
-
-    # Apply user filter
-    if user_filter:
-        audit_logs = audit_logs.filter(user__username__icontains=user_filter)
-
-    # Apply date filters
-    if date_from:
-        audit_logs = audit_logs.filter(timestamp__date__gte=date_from)
-    if date_to:
-        audit_logs = audit_logs.filter(timestamp__date__lte=date_to)
-
-    # Pagination
-    paginator = Paginator(audit_logs, 25)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    # Stats
-    total_logs = AuditLog.objects.count()
-    today_logs = AuditLog.objects.filter(timestamp__date=timezone.now().date()).count()
-
-    # Action distribution for chart
-    action_stats = AuditLog.objects.values('action').annotate(count=Count('id')).order_by('-count')[:10]
-
-    # Recent activity (last 7 days)
-    seven_days_ago = timezone.now() - timedelta(days=7)
-    recent_activity = AuditLog.objects.filter(timestamp__gte=seven_days_ago).values('timestamp__date').annotate(count=Count('id')).order_by('timestamp__date')
-
-    context = {
-        'page_obj': page_obj,
-        'search_query': search_query,
-        'action_filter': action_filter,
-        'user_filter': user_filter,
-        'date_from': date_from,
-        'date_to': date_to,
-        'total_logs': total_logs,
-        'today_logs': today_logs,
-        'action_stats': action_stats,
-        'recent_activity': recent_activity,
-    }
-    return render(request, 'staff_dashboard/manage_audit_logs.html', context)
 

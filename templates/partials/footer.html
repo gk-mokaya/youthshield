@@ -178,6 +178,15 @@
                             <p>{{ website_settings.contact_phone|default:"+254 797 252 133" }}</p>
                         </div>
                     </li>
+                    {% if website_settings.emergency_phone %}
+                    <li>
+                        <i class="fas fa-phone-volume"></i>
+                        <div>
+                            <strong>Emergency</strong>
+                            <p>{{ website_settings.emergency_phone }}</p>
+                        </div>
+                    </li>
+                    {% endif %}
                     <li>
                         <i class="fas fa-envelope"></i>
                         <div>
@@ -185,6 +194,24 @@
                             <p>{{ website_settings.contact_email|default:"info@youthshield.org" }}</p>
                         </div>
                     </li>
+                    {% if website_settings.support_email %}
+                    <li>
+                        <i class="fas fa-headset"></i>
+                        <div>
+                            <strong>Support</strong>
+                            <p>{{ website_settings.support_email }}</p>
+                        </div>
+                    </li>
+                    {% endif %}
+                    {% if website_settings.working_hours %}
+                    <li>
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>Working Hours</strong>
+                            <p>{{ website_settings.working_hours }}</p>
+                        </div>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

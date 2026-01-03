@@ -864,32 +864,16 @@
         document.getElementById('deleteModal').style.display = 'none';
     }
 
-    // Toggle resolved status
+    // Toggle resolved status (local only)
     function toggleResolved() {
-        const resolved = document.getElementById('modalResolved').checked;
-
-        fetch(`/staff/update-message/${currentMessageId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ resolved: resolved })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Reload page to reflect changes
-                setTimeout(() => location.reload(), 300);
-            }
-        });
+        // No server request, just toggle the checkbox locally
     }
 
     // Update status
     function updateStatus() {
         const resolved = document.getElementById('modalResolved').checked;
 
-        fetch(`/staff/update-message/${currentMessageId}/`, {
+        fetch(`/staff/contact-messages/${currentMessageId}/edit/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken'),
@@ -900,16 +884,17 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Status updated successfully!');
                 closeMessageModal();
-                // Reload page to reflect changes
-                setTimeout(() => location.reload(), 300);
+                // Reload page to reflect changes and show toast message
+                location.reload();
             } else {
-                alert('Failed to update status: ' + (data.error || 'Unknown error'));
+                // Error message will be shown via Django messages
+                location.reload();
             }
         })
         .catch(error => {
-            alert('Error updating status: ' + error.message);
+            // Error message will be shown via Django messages
+            location.reload();
         });
     }
 

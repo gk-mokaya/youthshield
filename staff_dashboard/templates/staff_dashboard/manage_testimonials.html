@@ -213,7 +213,7 @@
     .testimonial-status {
         position: absolute;
         top: 1.5rem;
-        right: 1.5rem;
+        left: 5.5rem;
     }
 
     .status-badge {
@@ -275,6 +275,7 @@
         display: flex;
         align-items: center;
         gap: 0.25rem;
+        
     }
 
     .testimonial-actions {
@@ -331,6 +332,15 @@
 
     .btn-reject:hover {
         background: #dc2626;
+    }
+
+    .btn-unapprove {
+        background: var(--warning-color);
+        color: white;
+    }
+
+    .btn-unapprove:hover {
+        background: #d97706;
     }
 
     /* Empty State */
@@ -682,9 +692,6 @@
                 </div>
 
                 <div class="testimonial-actions">
-                    <button class="btn-action btn-edit" onclick="showEditModal({{ testimonial.id }})">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
                     {% if testimonial.status == 'pending' %}
                     <button class="btn-action btn-approve" onclick="approveTestimonial({{ testimonial.id }})">
                         <i class="fas fa-check"></i> Approve
@@ -692,10 +699,11 @@
                     <button class="btn-action btn-reject" onclick="rejectTestimonial({{ testimonial.id }})">
                         <i class="fas fa-times"></i> Reject
                     </button>
-                    {% endif %}
-                    <button class="btn-action btn-delete" onclick="showDeleteModal({{ testimonial.id }})">
-                        <i class="fas fa-trash"></i> Delete
+                    {% elif testimonial.status == 'approved' %}
+                    <button class="btn-action btn-unapprove" onclick="unapproveTestimonial({{ testimonial.id }})">
+                        <i class="fas fa-undo"></i> Unapprove
                     </button>
+                    {% endif %}
                 </div>
             </div>
         </div>

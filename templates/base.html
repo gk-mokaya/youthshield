@@ -25,9 +25,9 @@
     
     <style>
         :root {
-            --primary-color: #4361ee;
-            --secondary-color: #3a0ca3;
-            --accent-color: #f72585;
+            --primary-color: {{ website_settings.primary_color|default:"#4361ee" }};
+            --secondary-color: {{ website_settings.secondary_color|default:"#3a0ca3" }};
+            --accent-color: {{ website_settings.accent_color|default:"#f72585" }};
             --light-color: #f8f9fa;
             --dark-color: #212529;
             --gray-color: #6c757d;

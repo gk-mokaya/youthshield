@@ -1,4 +1,4 @@
-{% load static %}
+o{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -346,6 +346,18 @@
                 <a href="{% url 'staff_dashboard:manage_backups' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_backups' %}active{% endif %}">
                     <i class="fas fa-database"></i>
                     <span>Manage Backups</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'staff_dashboard:manage_website_settings' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_website_settings' %}active{% endif %}">
+                    <i class="fas fa-globe"></i>
+                    <span>Website Management</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'staff_dashboard:manage_audit_logs' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_audit_logs' %}active{% endif %}">
+                    <i class="fas fa-history"></i>
+                    <span>Audit Logs</span>
                 </a>
             </li>
         </ul>

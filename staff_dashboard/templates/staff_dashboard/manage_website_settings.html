@@ -1,0 +1,443 @@
+{% extends 'staff_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Manage Website Settings{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-cogs me-2"></i>Website Settings</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Organization Information -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-building text-primary me-2"></i>Organization Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_name" class="form-label fw-bold">Organization Name</label>
+                                            <input type="text" class="form-control form-control-lg shadow-sm" id="id_name" name="name"
+                                                   value="{{ settings.name }}" required>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_Registration_Number" class="form-label fw-bold">Registration Number</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_Registration_Number"
+                                                   name="Registration_Number" value="{{ settings.Registration_Number }}" required>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_tagline" class="form-label fw-bold">Tagline</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_tagline" name="tagline"
+                                                   value="{{ settings.tagline }}" placeholder="Short tagline or slogan">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_description" class="form-label fw-bold">Description</label>
+                                            <textarea class="form-control shadow-sm" id="id_description" name="description"
+                                                      rows="3" placeholder="Brief organization description">{{ settings.description }}</textarea>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_mission" class="form-label fw-bold">Mission</label>
+                                            <textarea class="form-control shadow-sm" id="id_mission" name="mission"
+                                                      rows="4" required>{{ settings.mission }}</textarea>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_vision" class="form-label fw-bold">Vision</label>
+                                            <textarea class="form-control shadow-sm" id="id_vision" name="vision"
+                                                      rows="4" required>{{ settings.vision }}</textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_contact_email" class="form-label fw-bold">Contact Email</label>
+                                            <input type="email" class="form-control shadow-sm" id="id_contact_email"
+                                                   name="contact_email" value="{{ settings.contact_email }}" required>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_contact_phone" class="form-label fw-bold">Contact Phone</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_contact_phone"
+                                                   name="contact_phone" value="{{ settings.contact_phone }}" required>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_emergency_phone" class="form-label fw-bold">Emergency Phone</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_emergency_phone"
+                                                   name="emergency_phone" value="{{ settings.emergency_phone }}">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_support_email" class="form-label fw-bold">Support Email</label>
+                                            <input type="email" class="form-control shadow-sm" id="id_support_email"
+                                                   name="support_email" value="{{ settings.support_email }}">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_address" class="form-label fw-bold">Address</label>
+                                            <textarea class="form-control shadow-sm" id="id_address" name="address"
+                                                      rows="3" required>{{ settings.address }}</textarea>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_website_url" class="form-label fw-bold">Website URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_website_url"
+                                                   name="website_url" value="{{ settings.website_url }}"
+                                                   placeholder="https://www.example.com">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Media Links -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fab fa-share-alt text-success me-2"></i>Social Media Links</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_facebook_url" class="form-label fw-bold"><i class="fab fa-facebook text-primary me-1"></i>Facebook URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_facebook_url"
+                                                   name="facebook_url" value="{{ settings.facebook_url }}"
+                                                   placeholder="https://www.facebook.com/yourpage">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_twitter_url" class="form-label fw-bold"><i class="fab fa-twitter text-info me-1"></i>Twitter/X URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_twitter_url"
+                                                   name="twitter_url" value="{{ settings.twitter_url }}"
+                                                   placeholder="https://twitter.com/yourhandle">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_instagram_url" class="form-label fw-bold"><i class="fab fa-instagram text-danger me-1"></i>Instagram URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_instagram_url"
+                                                   name="instagram_url" value="{{ settings.instagram_url }}"
+                                                   placeholder="https://www.instagram.com/yourhandle">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_linkedin_url" class="form-label fw-bold"><i class="fab fa-linkedin text-primary me-1"></i>LinkedIn URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_linkedin_url"
+                                                   name="linkedin_url" value="{{ settings.linkedin_url }}"
+                                                   placeholder="https://www.linkedin.com/company/yourcompany">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_tiktok_url" class="form-label fw-bold"><i class="fab fa-tiktok text-dark me-1"></i>TikTok URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_tiktok_url"
+                                                   name="tiktok_url" value="{{ settings.tiktok_url }}"
+                                                   placeholder="https://www.tiktok.com/@yourhandle">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_whatsapp_channel_url" class="form-label fw-bold"><i class="fab fa-whatsapp text-success me-1"></i>WhatsApp Channel URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_whatsapp_channel_url"
+                                                   name="whatsapp_channel_url" value="{{ settings.whatsapp_channel_url }}"
+                                                   placeholder="https://whatsapp.com/channel/yourchannel">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Theme Colors -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-palette text-warning me-2"></i>Theme Colors</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="id_primary_color" class="form-label fw-bold">Primary Color</label>
+                                            <div class="input-group shadow-sm">
+                                                <input type="color" class="form-control form-control-color"
+                                                       id="id_primary_color" name="primary_color"
+                                                       value="{{ settings.primary_color }}">
+                                                <input type="text" class="form-control" readonly
+                                                       value="{{ settings.primary_color }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="id_secondary_color" class="form-label fw-bold">Secondary Color</label>
+                                            <div class="input-group shadow-sm">
+                                                <input type="color" class="form-control form-control-color"
+                                                       id="id_secondary_color" name="secondary_color"
+                                                       value="{{ settings.secondary_color }}">
+                                                <input type="text" class="form-control" readonly
+                                                       value="{{ settings.secondary_color }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="id_accent_color" class="form-label fw-bold">Accent Color</label>
+                                            <div class="input-group shadow-sm">
+                                                <input type="color" class="form-control form-control-color"
+                                                       id="id_accent_color" name="accent_color"
+                                                       value="{{ settings.accent_color }}">
+                                                <input type="text" class="form-control" readonly
+                                                       value="{{ settings.accent_color }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Logo & Copyright -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-image text-secondary me-2"></i>Logo & Copyright</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_logo" class="form-label fw-bold">Organization Logo</label>
+                                            <input type="file" class="form-control shadow-sm" id="id_logo" name="logo"
+                                                   accept="image/*">
+                                            <small class="form-text text-muted">
+                                                Upload a new logo image. Leave empty to keep current logo.
+                                            </small>
+                                        </div>
+
+                                        {% if settings.logo %}
+                                        <div class="mt-3">
+                                            <label class="form-label fw-bold">Current Logo:</label><br>
+                                            <img src="{{ settings.logo.url }}" alt="Current Logo"
+                                                 class="img-thumbnail shadow-sm" style="max-width: 200px; max-height: 100px;">
+                                        </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_copyright_text" class="form-label fw-bold">Copyright Text</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_copyright_text"
+                                                   name="copyright_text" value="{{ settings.copyright_text }}"
+                                                   placeholder="© 2024 Your Organization Name. All rights reserved.">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEO Settings -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-search text-danger me-2"></i>SEO Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_meta_title" class="form-label fw-bold">Meta Title</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_meta_title"
+                                                   name="meta_title" value="{{ settings.meta_title }}"
+                                                   placeholder="Default page title for SEO">
+                                            <small class="form-text text-muted">
+                                                Default title tag for pages (50-60 characters recommended)
+                                            </small>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_meta_description" class="form-label fw-bold">Meta Description</label>
+                                            <textarea class="form-control shadow-sm" id="id_meta_description"
+                                                      name="meta_description" rows="3"
+                                                      placeholder="Default meta description">{{ settings.meta_description }}</textarea>
+                                            <small class="form-text text-muted">
+                                                Default description for search engines (150-160 characters recommended)
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_meta_keywords" class="form-label fw-bold">Meta Keywords</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_meta_keywords"
+                                                   name="meta_keywords" value="{{ settings.meta_keywords }}"
+                                                   placeholder="keyword1, keyword2, keyword3">
+                                            <small class="form-text text-muted">
+                                                Comma-separated keywords for SEO
+                                            </small>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_google_analytics_id" class="form-label fw-bold">Google Analytics ID</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_google_analytics_id"
+                                                   name="google_analytics_id" value="{{ settings.google_analytics_id }}"
+                                                   placeholder="GA-XXXXXXXXXX or G-XXXXXXXXXX">
+                                            <small class="form-text text-muted">
+                                                Your Google Analytics tracking ID
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Settings -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-cogs text-dark me-2"></i>Additional Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_default_language" class="form-label fw-bold">Default Language</label>
+                                            <select class="form-control shadow-sm" id="id_default_language" name="default_language">
+                                                <option value="en" {% if settings.default_language == 'en' %}selected{% endif %}>English</option>
+                                                <option value="es" {% if settings.default_language == 'es' %}selected{% endif %}>Spanish</option>
+                                                <option value="fr" {% if settings.default_language == 'fr' %}selected{% endif %}>French</option>
+                                                <option value="de" {% if settings.default_language == 'de' %}selected{% endif %}>German</option>
+                                                <option value="it" {% if settings.default_language == 'it' %}selected{% endif %}>Italian</option>
+                                                <option value="pt" {% if settings.default_language == 'pt' %}selected{% endif %}>Portuguese</option>
+                                                <option value="ru" {% if settings.default_language == 'ru' %}selected{% endif %}>Russian</option>
+                                                <option value="zh" {% if settings.default_language == 'zh' %}selected{% endif %}>Chinese</option>
+                                                <option value="ja" {% if settings.default_language == 'ja' %}selected{% endif %}>Japanese</option>
+                                                <option value="ko" {% if settings.default_language == 'ko' %}selected{% endif %}>Korean</option>
+                                                <option value="ar" {% if settings.default_language == 'ar' %}selected{% endif %}>Arabic</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_timezone" class="form-label fw-bold">Timezone</label>
+                                            <select class="form-control shadow-sm" id="id_timezone" name="timezone">
+                                                <option value="UTC" {% if settings.timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                                                <option value="America/New_York" {% if settings.timezone == 'America/New_York' %}selected{% endif %}>Eastern Time</option>
+                                                <option value="America/Chicago" {% if settings.timezone == 'America/Chicago' %}selected{% endif %}>Central Time</option>
+                                                <option value="America/Denver" {% if settings.timezone == 'America/Denver' %}selected{% endif %}>Mountain Time</option>
+                                                <option value="America/Los_Angeles" {% if settings.timezone == 'America/Los_Angeles' %}selected{% endif %}>Pacific Time</option>
+                                                <option value="Europe/London" {% if settings.timezone == 'Europe/London' %}selected{% endif %}>London</option>
+                                                <option value="Europe/Paris" {% if settings.timezone == 'Europe/Paris' %}selected{% endif %}>Paris</option>
+                                                <option value="Europe/Berlin" {% if settings.timezone == 'Europe/Berlin' %}selected{% endif %}>Berlin</option>
+                                                <option value="Asia/Tokyo" {% if settings.timezone == 'Asia/Tokyo' %}selected{% endif %}>Tokyo</option>
+                                                <option value="Asia/Shanghai" {% if settings.timezone == 'Asia/Shanghai' %}selected{% endif %}>Shanghai</option>
+                                                <option value="Asia/Kolkata" {% if settings.timezone == 'Asia/Kolkata' %}selected{% endif %}>India</option>
+                                                <option value="Australia/Sydney" {% if settings.timezone == 'Australia/Sydney' %}selected{% endif %}>Sydney</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_working_hours" class="form-label fw-bold">Working Hours</label>
+                                            <input type="text" class="form-control shadow-sm" id="id_working_hours"
+                                                   name="working_hours" value="{{ settings.working_hours }}"
+                                                   placeholder="Mon-Fri: 9AM-5PM, Sat: 10AM-2PM">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="id_privacy_policy_url" class="form-label fw-bold">Privacy Policy URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_privacy_policy_url"
+                                                   name="privacy_policy_url" value="{{ settings.privacy_policy_url }}"
+                                                   placeholder="https://www.example.com/privacy-policy">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_terms_of_service_url" class="form-label fw-bold">Terms of Service URL</label>
+                                            <input type="url" class="form-control shadow-sm" id="id_terms_of_service_url"
+                                                   name="terms_of_service_url" value="{{ settings.terms_of_service_url }}"
+                                                   placeholder="https://www.example.com/terms-of-service">
+                                        </div>
+
+                                        <div class="form-group mb-3">
+                                            <label for="id_footer_text" class="form-label fw-bold">Footer Text</label>
+                                            <textarea class="form-control shadow-sm" id="id_footer_text"
+                                                      name="footer_text" rows="2"
+                                                      placeholder="Additional footer content">{{ settings.footer_text }}</textarea>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" class="form-check-input" id="id_maintenance_mode"
+                                                   name="maintenance_mode" {% if settings.maintenance_mode %}checked{% endif %}>
+                                            <label class="form-check-label fw-bold" for="id_maintenance_mode">
+                                                Enable Maintenance Mode
+                                            </label>
+                                            <small class="form-text text-muted d-block">
+                                                When enabled, the website will show a maintenance page to visitors
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-paper-plane text-info me-2"></i>Actions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary btn-lg me-3">
+                                            <i class="fas fa-save me-2"></i>Save Settings
+                                        </button>
+                                        <a href="{% url 'staff_dashboard:dashboard' %}" class="btn btn-secondary btn-lg">
+                                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control-color {
+    width: 60px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+
+.input-group .form-control-color {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .form-control[readonly] {
+    background-color: #e9ecef;
+    border-left: none;
+}
+</style>
+
+<script>
+// Update color text input when color picker changes
+document.querySelectorAll('.form-control-color').forEach(function(colorInput) {
+    colorInput.addEventListener('input', function() {
+        this.nextElementSibling.value = this.value;
+    });
+});
+</script>
+{% endblock %}

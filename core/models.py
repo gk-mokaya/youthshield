@@ -31,6 +31,21 @@ class WebsiteSetting(models.Model):
     copyright_text = models.CharField(max_length=200, default="© 2025 Youth Shield Foundation. All rights reserved.", help_text="Copyright notice")
     description = models.TextField(blank=True, null=True, help_text="Brief organization description")
 
+    # SEO Settings
+    meta_title = models.CharField(max_length=200, blank=True, null=True, help_text="Page title for SEO")
+    meta_description = models.TextField(blank=True, null=True, help_text="Meta description for SEO")
+    meta_keywords = models.CharField(max_length=500, blank=True, null=True, help_text="Comma-separated keywords for SEO")
+    google_analytics_id = models.CharField(max_length=50, blank=True, null=True, help_text="Google Analytics tracking ID")
+
+    # Additional Settings
+    default_language = models.CharField(max_length=10, default='en', help_text="Default language code (e.g., 'en', 'sw')")
+    timezone = models.CharField(max_length=50, default='Africa/Nairobi', help_text="Timezone for the organization")
+    working_hours = models.CharField(max_length=200, blank=True, null=True, help_text="Working hours information")
+    privacy_policy_url = models.URLField(blank=True, null=True, help_text="Privacy policy page URL")
+    terms_of_service_url = models.URLField(blank=True, null=True, help_text="Terms of service page URL")
+    footer_text = models.TextField(blank=True, null=True, help_text="Additional footer text")
+    maintenance_mode = models.BooleanField(default=False, help_text="Enable maintenance mode")
+
     def __str__(self):
         return self.name
 

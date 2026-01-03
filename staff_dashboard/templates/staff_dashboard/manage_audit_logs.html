@@ -1,0 +1,738 @@
+{% extends 'staff_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Audit Logs | Staff Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/staff-dashboard.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #4f46e5;
+        --secondary-color: #7c3aed;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --bg-light: #f8fafc;
+        --bg-card: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+    }
+
+    .dark-mode {
+        --bg-light: #0f172a;
+        --bg-card: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border-color: #334155;
+    }
+
+    .audit-logs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    /* Header */
+    .audit-logs-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .audit-logs-title {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .audit-logs-title i {
+        color: var(--primary-color);
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.75rem;
+        min-width: 120px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+    }
+
+    /* Filters */
+    .filters-section {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-input, .filter-select {
+        padding: 0.75rem 1rem;
+        background: var(--bg-light);
+        border: 2px solid var(--border-color);
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .filter-input:focus, .filter-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .filters-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+    }
+
+    .btn-filter {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .btn-apply {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-apply:hover {
+        background: #4338ca;
+    }
+
+    .btn-clear {
+        background: var(--bg-light);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-clear:hover {
+        background: var(--border-color);
+    }
+
+    /* Table */
+    .audit-logs-table {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    .table-header {
+        background: var(--bg-light);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .audit-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .audit-table th, .audit-table td {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .audit-table th {
+        background: var(--bg-light);
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .audit-table td {
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+
+    .audit-table tbody tr:hover {
+        background: var(--bg-light);
+    }
+
+    .timestamp {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .user-email {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .action-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .action-create {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success-color);
+    }
+
+    .action-update {
+        background: rgba(79, 70, 229, 0.1);
+        color: var(--primary-color);
+    }
+
+    .action-delete {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger-color);
+    }
+
+    .action-login {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning-color);
+    }
+
+    .action-logout {
+        background: rgba(100, 116, 139, 0.1);
+        color: var(--text-secondary);
+    }
+
+    .model-info {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .object-id {
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        background: var(--bg-light);
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .message {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+        font-size: 3rem;
+        color: var(--border-color);
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+
+    /* Pagination */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        gap: 0.5rem;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        color: var(--text-primary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .pagination-btn:hover:not(.disabled) {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Charts */
+    .charts-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 1rem;
+        padding: 1.5rem;
+    }
+
+    .chart-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+    }
+
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .audit-logs-container {
+            padding: 1rem;
+        }
+
+        .audit-logs-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 1rem;
+        }
+
+        .header-stats {
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            min-width: calc(50% - 0.75rem);
+        }
+
+        .filters-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-actions {
+            flex-direction: column;
+        }
+
+        .charts-section {
+            grid-template-columns: 1fr;
+        }
+
+        .table-container {
+            font-size: 0.8rem;
+        }
+
+        .audit-table th, .audit-table td {
+            padding: 0.75rem 1rem;
+        }
+
+        .user-info {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .message {
+            max-width: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="audit-logs-container">
+    <!-- Header -->
+    <div class="audit-logs-header">
+        <div>
+            <h1 class="audit-logs-title">
+                <i class="fas fa-history"></i>
+                Audit Logs
+            </h1>
+            <p class="text-muted">Monitor system activities and user actions</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ total_logs }}</span>
+                <span class="stat-label">Total Logs</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ today_logs }}</span>
+                <span class="stat-label">Today</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <!-- Action Distribution Chart -->
+        <div class="chart-card">
+            <h3 class="chart-title">Action Distribution</h3>
+            <div class="chart-container">
+                <canvas id="actionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Activity Chart -->
+        <div class="chart-card">
+            <h3 class="chart-title">Recent Activity (Last 7 Days)</h3>
+            <div class="chart-container">
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="filters-section">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label class="filter-label" for="search">Search</label>
+                <input type="text"
+                       class="filter-input"
+                       id="search"
+                       name="search"
+                       placeholder="Search logs..."
+                       value="{{ search_query }}">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="action">Action</label>
+                <select class="filter-select" id="action" name="action">
+                    <option value="">All Actions</option>
+                    <option value="create" {% if action_filter == 'create' %}selected{% endif %}>Create</option>
+                    <option value="update" {% if action_filter == 'update' %}selected{% endif %}>Update</option>
+                    <option value="delete" {% if action_filter == 'delete' %}selected{% endif %}>Delete</option>
+                    <option value="login" {% if action_filter == 'login' %}selected{% endif %}>Login</option>
+                    <option value="logout" {% if action_filter == 'logout' %}selected{% endif %}>Logout</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="user">User</label>
+                <input type="text"
+                       class="filter-input"
+                       id="user"
+                       name="user"
+                       placeholder="Username..."
+                       value="{{ user_filter }}">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="date_from">From Date</label>
+                <input type="date"
+                       class="filter-input"
+                       id="date_from"
+                       name="date_from"
+                       value="{{ date_from }}">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label" for="date_to">To Date</label>
+                <input type="date"
+                       class="filter-input"
+                       id="date_to"
+                       name="date_to"
+                       value="{{ date_to }}">
+            </div>
+        </div>
+
+        <div class="filters-actions">
+            <button type="submit" class="btn-filter btn-apply">
+                <i class="fas fa-search"></i> Apply Filters
+            </button>
+            <a href="{% url 'staff_dashboard:manage_audit_logs' %}" class="btn-filter btn-clear">
+                <i class="fas fa-times"></i> Clear Filters
+            </a>
+        </div>
+    </form>
+
+    <!-- Audit Logs Table -->
+    <div class="audit-logs-table">
+        <div class="table-header">
+            <h3 class="table-title">Activity Log</h3>
+        </div>
+
+        <div class="table-container">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Model</th>
+                        <th>Object ID</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in page_obj %}
+                    <tr>
+                        <td>
+                            <div class="timestamp">{{ log.timestamp|date:"M d, Y H:i:s" }}</div>
+                        </td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    {% if log.user.first_name and log.user.last_name %}
+                                        {{ log.user.first_name|first }}{{ log.user.last_name|first }}
+                                    {% else %}
+                                        {{ log.user.username|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="user-details">
+                                    <div class="user-name">{{ log.user.get_full_name|default:log.user.username }}</div>
+                                    <div class="user-email">{{ log.user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="action-badge action-{{ log.action|lower }}">
+                                {{ log.action|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="model-info">{{ log.model_name|title }}</div>
+                        </td>
+                        <td>
+                            <span class="object-id">{{ log.object_id }}</span>
+                        </td>
+                        <td>
+                            <div class="message" title="{{ log.message }}">{{ log.message }}</div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h3>No Audit Logs Found</h3>
+                            <p>No system activities to display</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        {% if page_obj.has_previous %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.previous_page_number }})">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <button class="pagination-btn active">{{ num }}</button>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <button class="pagination-btn" onclick="goToPage({{ num }})">{{ num }}</button>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <button class="pagination-btn" onclick="goToPage({{ page_obj.next_page_number }})">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% else %}
+        <button class="pagination-btn disabled">
+            Next <i class="fas fa-chevron-right"></i>
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Pagination
+    function goToPage(page) {
+        const url = new URL(window.location);
+        url.searchParams.set('page', page);
+        window.location.href = url.toString();
+    }
+
+    // Action Distribution Chart
+    const actionChartCtx = document.getElementById('actionChart').getContext('2d');
+    const actionData = {{ action_stats|safe }};
+
+    new Chart(actionChartCtx, {
+        type: 'doughnut',
+        data: {
+            labels: actionData.map(item => item.action.charAt(0).toUpperCase() + item.action.slice(1)),
+            datasets: [{
+                data: actionData.map(item => item.count),
+                backgroundColor: [
+                    '#10b981', // create - green
+                    '#4f46e5', // update - blue
+                    '#ef4444', // delete - red
+                    '#f59e0b', // login - yellow
+                    '#64748b', // logout - gray
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    // Recent Activity Chart
+    const activityChartCtx = document.getElementById('activityChart').getContext('2d');
+    const activityData = {{ recent_activity|safe }};
+
+    new Chart(activityChartCtx, {
+        type: 'line',
+        data: {
+            labels: activityData.map(item => new Date(item.timestamp__date).toLocaleDateString()),
+            datasets: [{
+                label: 'Activities',
+                data: activityData.map(item => item.count),
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

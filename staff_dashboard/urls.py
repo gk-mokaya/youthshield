@@ -28,6 +28,7 @@ urlpatterns = [
     path('testimonials/<int:testimonial_id>/get/', views.get_testimonial, name='get_testimonial'),
     path('testimonials/<int:testimonial_id>/approve/', views.approve_testimonial, name='approve_testimonial'),
     path('testimonials/<int:testimonial_id>/reject/', views.reject_testimonial, name='reject_testimonial'),
+    path('testimonials/<int:testimonial_id>/unapprove/', views.unapprove_testimonial, name='unapprove_testimonial'),
     path('testimonials/<int:testimonial_id>/delete/', views.delete_testimonial, name='delete_testimonial'),
     path('contact-messages/<int:message_id>/get/', views.get_contact_message, name='get_contact_message'),
     path('contact-messages/<int:message_id>/reply/', views.reply_contact_message, name='reply_contact_message'),
@@ -37,4 +38,6 @@ urlpatterns = [
     path('backups/<str:backup_id>/delete/', views.delete_backup, name='delete_backup'),
     path('backups/<str:backup_id>/download/', views.download_backup, name='download_backup'),
     path('backups/save-auto-backup-settings/', views.save_auto_backup_settings, name='save_auto_backup_settings'),
+    path('website-settings/', views.manage_website_settings, name='manage_website_settings'),
+    path('audit-logs/', views.manage_audit_logs, name='manage_audit_logs'),
 ]

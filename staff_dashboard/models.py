@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.db.models import JSONField
 
 class BackupJob(models.Model):
     FREQUENCY_CHOICES = [
@@ -49,6 +50,11 @@ class BackupJob(models.Model):
     def calculate_next_run(self):
         """Calculate the next run time based on frequency"""
         now = timezone.now()
+
+        # Ensure backup_time is a Time object
+        if isinstance(self.backup_time, str):
+            from datetime import datetime
+            self.backup_time = datetime.strptime(self.backup_time, '%H:%M').time()
 
         if self.frequency == 'daily':
             next_run = now.replace(hour=self.backup_time.hour, minute=self.backup_time.minute, second=0, microsecond=0)
@@ -159,3 +165,42 @@ class BackupLog(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+class AuditLog(models.Model):
+    ACTION_CHOICES = [
+        ('login', 'User Login'),
+        ('logout', 'User Logout'),
+        ('view', 'Page View'),
+        ('create', 'Create Record'),
+        ('update', 'Update Record'),
+        ('delete', 'Delete Record'),
+        ('export', 'Export Data'),
+        ('import', 'Import Data'),
+        ('backup', 'Backup Operation'),
+        ('settings', 'Settings Change'),
+        ('other', 'Other Action'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES, default='other')
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    url = models.CharField(max_length=500, blank=True)
+    method = models.CharField(max_length=10, blank=True)
+    details = JSONField(null=True, blank=True, help_text='Additional details about the action')
+    model_name = models.CharField(max_length=100, blank=True, help_text='Name of the model affected by the action')
+    object_id = models.CharField(max_length=100, blank=True, help_text='ID of the object affected by the action')
+    message = models.TextField(blank=True, help_text='Description of the action performed')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user_agent = models.TextField(blank=True, help_text='User agent string from browser')
+
+    def __str__(self):
+        user_name = self.user.username if self.user else 'Anonymous'
+        return f"{user_name} - {self.action} - {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['user', 'timestamp']),
+            models.Index(fields=['action', 'timestamp']),
+            models.Index(fields=['ip_address']),
+        ]

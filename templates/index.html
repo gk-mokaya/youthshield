@@ -177,8 +177,11 @@
 <section class="hero">
     <div class="container">
         <div class="hero-content slide-up">
-            <h1>Shielding Youth, Empowering Futures</h1>
-            <p>Youth Shield Foundaton is a non-governmental organization dedicated to creating a society free from drug and substance abuse.</p>
+            <h1>{{ website_settings.name|default:"Shielding Youth, Empowering Futures" }}</h1>
+            {% if website_settings.tagline %}
+            <h2 style="font-size: 1.2rem; margin-bottom: 20px; opacity: 0.9;">{{ website_settings.tagline }}</h2>
+            {% endif %}
+            <p>{{ website_settings.description|default:"Youth Shield Foundation is a non-governmental organization dedicated to creating a society free from drug and substance abuse." }}</p>
             <div class="hero-buttons">
                 <a href="{% url 'core:programs' %}" class="btn btn-accent">Explore Programs</a>
             </div>
@@ -238,6 +241,40 @@
     </div>
 </section>
 
+<!-- Mission & Vision Section -->
+<section class="mission-vision" style="background-color: var(--light-color); padding: 80px 0;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-5">
+                        <div class="mission-icon mb-4" style="font-size: 3rem; color: var(--primary-color);">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3 class="card-title mb-3" style="color: var(--primary-color);">Our Mission</h3>
+                        <p class="card-text" style="font-size: 1.1rem; line-height: 1.6;">
+                            {{ website_settings.mission|default:"To empower youth and women to become productive, morally upright citizens through education, mentorship, rehabilitation, and career-building opportunities, fostering long-term personal and professional growth for a healthier future." }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-5">
+                        <div class="vision-icon mb-4" style="font-size: 3rem; color: var(--secondary-color);">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h3 class="card-title mb-3" style="color: var(--secondary-color);">Our Vision</h3>
+                        <p class="card-text" style="font-size: 1.1rem; line-height: 1.6;">
+                            {{ website_settings.vision|default:"To create a society free from drug and substance abuse where youth and women thrive as empowered, productive citizens contributing positively to community development and national growth." }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Newsletter Section -->
 <section class="newsletter">
     <div class="container">
@@ -246,7 +283,7 @@
                 <h2>Stay Updated</h2>
                 <p>Subscribe to our newsletter today to receive the latest events, programs and community outreach programs.</p>
             </div>
-            
+
             <form class="newsletter-form" action="{% url 'core:newsletter_subscribe' %}" method="POST">
                 {% csrf_token %}
                 <input type="email" name="email" class="newsletter-input" placeholder="Enter your email address" required>
